@@ -31,19 +31,26 @@
     </div>
 
     <div id="adminPanel" style="display:none">
+
       <div class="card">
         <h3>انشاء جمعية جديدة</h3>
         <div class="grid">
           <div class="col-6"><input class="input" id="socName" placeholder="اسم الجمعية"></div>
           <div class="col-6"><input class="input" id="socStart" placeholder="تاريخ البداية مثل 2026-01-01"></div>
-          <div class="col-12"><button class="btn" onclick="createSoc()">انشاء</button></div>
+          <div class="col-12"><button class="btn" id="btnCreate" onclick="createSoc()">انشاء</button></div>
         </div>
+      </div>
+
+      <div class="card">
+        <h3>الجمعيات</h3>
+        <div class="grid" id="societiesAdmin"></div>
       </div>
 
       <div class="card">
         <h3>المشتركين</h3>
         <div id="members"></div>
       </div>
+
     </div>
   </div>
 
