@@ -1,15 +1,38 @@
-document.getElementById("logout").addEventListener("click", function(e){
-  e.preventDefault();
-  خروج();
-});
+/* =========================
+   admin.js كامل
+   - يمنع دخول المشترك لصفحة المدير
+   - دخول المدير بالـ PIN
+   - عرض الجمعيات + عرض المشتركين مع نسخ PIN
+   - انشاء جمعية مع منع ضغط مزدوج على زر الانشاء
+   ========================= */
+
+(function(){
+  const s = جلسة();
+
+  // اذا مشترك يحول تلقائيا
+  if(s.token && s.role === "مشترك"){
+    location.href = "member.html";
+    return;
+  }
+})();
+
+const elLogout = document.getElementById("logout");
+if(elLogout){
+  elLogout.addEventListener("click", function(e){
+    e.preventDefault();
+    خروج();
+  });
+}
 
 function showPanel(show){
-  document.getElementById("loginBox").style.display = show ? "none" : "";
-  document.getElementById("adminPanel").style.display = show ? "" : "none";
+  const loginBox = document.getElementById("loginBox");
+  const adminPanel = document.getElementById("adminPanel");
+  if(loginBox) loginBox.style.display = show ? "none" : "";
+  if(adminPanel) adminPanel.style.display = show ? "" : "none";
 }
 
 function نسخ_نص(text){
-  navigator.clipboard.writeText(String(text||""))
+  navigator.clipboard.writeText(String(text || ""))
     .then(()=>msg("ok","تم النسخ"))
     .catch(()=>msg("err","تعذر النسخ"));
 }
@@ -17,15 +40,15 @@ function نسخ_نص(text){
 function بطاقة_جمعية(s){
   return `<div class="col-4">
     <div class="soc">
-      <div style="display:flex;justify-content:space-between;gap:10px;align-items:center">
+      <div style="display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap">
         <b>${esc(s.اسم)}</b>
         ${badge(s.حالة)}
       </div>
-      <div style="margin-top:8px">تاريخ البداية ${esc(s.تاريخ_البداية||"")}</div>
-      <div>تاريخ النهاية ${esc(s.تاريخ_النهاية||"")}</div>
-      <div>عدد المشتركين ${esc(s.عدد_المشتركين||0)}</div>
-      <div>عدد الاسهم ${esc(s.عدد_الاسهم||0)}</div>
-      <div>قيمة الجمعية الاجمالي ${esc(s.اجمالي_القيمة||0)}</div>
+      <div style="margin-top:8px">تاريخ البداية ${esc(s.تاريخ_البداية || "")}</div>
+      <div>تاريخ النهاية ${esc(s.تاريخ_النهاية || "")}</div>
+      <div>عدد المشتركين ${esc(s.عدد_المشتركين || 0)}</div>
+      <div>عدد الاسهم ${esc(s.عدد_الاسهم || 0)}</div>
+      <div>قيمة الجمعية الاجمالي ${esc(s.اجمالي_القيمة || 0)}</div>
     </div>
   </div>`;
 }
@@ -33,9 +56,12 @@ function بطاقة_جمعية(s){
 async function adminLogin(){
   msg("", "");
   try{
-    const رمز = document.getElementById("adminPin").value.trim();
+    const رمز = (document.getElementById("adminPin")?.value || "").trim();
+    if(!رمز) throw new Error("رمز PIN مطلوب");
+
     const data = await post({ action:"دخول بالرمز", رمز });
-    if(data.دور!=="مدير") throw new Error("هذا الرمز ليس للمدير");
+
+    if(data.دور !== "مدير") throw new Error("هذا الرمز ليس للمدير");
 
     حفظ_جلسة(data.token, "مدير");
     showPanel(true);
@@ -46,21 +72,25 @@ async function adminLogin(){
 }
 
 async function loadAdminData(){
+  msg("", "");
   const s = جلسة();
+
   try{
-    const data = await get("معلومات مدير", { token:s.token });
+    const data = await get("معلومات مدير", { token: s.token });
 
-    const members = data.مشتركين || [];
     const societies = data.جمعيات || [];
+    const members = data.مشتركين || [];
 
+    // عرض الجمعيات
     if(!societies.length){
-      setHtml("societiesAdmin","<div class='col-12'>لا توجد جمعيات</div>");
+      setHtml("societiesAdmin", "<div class='col-12'>لا توجد جمعيات</div>");
     }else{
       setHtml("societiesAdmin", societies.map(بطاقة_جمعية).join(""));
     }
 
+    // عرض المشتركين
     if(!members.length){
-      setHtml("members","لا يوجد مشتركين");
+      setHtml("members", "لا يوجد مشتركين");
     }else{
       const rows = members.map(x=>{
         const pin = esc(x.رمز);
@@ -82,6 +112,7 @@ async function loadAdminData(){
         ${rows}
       </table>`);
     }
+
   }catch(e){
     msg("err", e.message);
   }
@@ -96,8 +127,11 @@ async function createSoc(){
   const s = جلسة();
 
   try{
-    const اسم_الجمعية = document.getElementById("socName").value.trim();
-    const تاريخ_البداية = document.getElementById("socStart").value.trim();
+    const اسم_الجمعية = (document.getElementById("socName")?.value || "").trim();
+    const تاريخ_البداية = (document.getElementById("socStart")?.value || "").trim();
+
+    if(!اسم_الجمعية) throw new Error("اسم الجمعية مطلوب");
+    if(!تاريخ_البداية) throw new Error("تاريخ البداية مطلوب");
 
     const btn = document.getElementById("btnCreate");
     قفل_انشاء = true;
@@ -106,9 +140,10 @@ async function createSoc(){
     await post({ action:"انشاء جمعية", token:s.token, اسم_الجمعية, تاريخ_البداية });
 
     msg("ok","تم انشاء الجمعية");
+    if(document.getElementById("socName")) document.getElementById("socName").value = "";
+    if(document.getElementById("socStart")) document.getElementById("socStart").value = "";
+
     await loadAdminData();
-    document.getElementById("socName").value = "";
-    document.getElementById("socStart").value = "";
   }catch(e){
     msg("err", e.message);
   }finally{
@@ -118,10 +153,13 @@ async function createSoc(){
   }
 }
 
+// تشغيل تلقائي حسب الجلسة
 (function(){
   const s = جلسة();
-  if(s.token && s.role==="مدير"){
+  if(s.token && s.role === "مدير"){
     showPanel(true);
     loadAdminData();
+  }else{
+    showPanel(false);
   }
 })();
