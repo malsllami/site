@@ -1,4 +1,5 @@
 let معرف_الجمعية = "";
+let وضع = "انشاء"; // انشاء او تعديل
 
 function قراءة_معرف(){
   const u = new URL(location.href);
@@ -25,20 +26,44 @@ async function تحميل(){
   const sid = قراءة_معرف();
   if(!sid){ msg("err","معرف الجمعية غير صحيح"); return; }
 
+  const sess = جلسة();
+  const isMember = !!sess.token && sess.role==="مشترك";
+
   try{
-    const data = await get("تفاصيل جمعية", { معرف_الجمعية: sid });
-    const s = data.جمعية;
-    عرض_جمعية(s);
+    if(isMember){
+      const data = await get("تفاصيل جمعية للمشترك", { token:sess.token, معرف_الجمعية: sid });
+      const s = data.جمعية;
+      عرض_جمعية(s);
 
-    const sess = جلسة();
-    const isMember = !!sess.token && sess.role==="مشترك";
-    const joinBox = document.getElementById("joinBox");
+      const joinBox = document.getElementById("joinBox");
+      const shares = document.getElementById("shares");
+      const joinTitle = document.getElementById("joinTitle");
+      const btnSave = document.getElementById("btnSave");
 
-    if(isMember && s.حالة==="جديدة"){
-      joinBox.style.display = "";
-    }else{
-      joinBox.style.display = "none";
+      if(s.حالة==="جديدة"){
+        joinBox.style.display = "";
+
+        if(data.مشترك_مسجل){
+          msg("ok","انت مشترك مسبقا في هذه الجمعية, يمكنك تعديل الاسهم طالما الجمعية جديدة");
+          shares.value = String(data.عدد_اسهم_المشترك || "");
+          وضع = "تعديل";
+          joinTitle.textContent = "تعديل الاسهم في الجمعية الجديدة";
+          btnSave.textContent = "تعديل";
+        }else{
+          shares.value = "";
+          وضع = "انشاء";
+          joinTitle.textContent = "التسجيل في الجمعية الجديدة";
+          btnSave.textContent = "حفظ وارسال";
+        }
+      }else{
+        joinBox.style.display = "none";
+      }
+      return;
     }
+
+    const data = await get("تفاصيل جمعية", { معرف_الجمعية: sid });
+    عرض_جمعية(data.جمعية);
+    document.getElementById("joinBox").style.display = "none";
   }catch(e){
     msg("err", e.message);
   }
@@ -46,7 +71,7 @@ async function تحميل(){
 
 let قفل = false;
 
-async function joinSoc(){
+async function saveShares(){
   if(قفل) return;
   msg("", "");
 
@@ -58,23 +83,33 @@ async function joinSoc(){
 
   try{
     const shares = document.getElementById("shares").value.trim();
-    const btn = document.getElementById("btnJoin");
+    const btn = document.getElementById("btnSave");
     قفل = true;
     if(btn) btn.disabled = true;
 
-    await post({
-      action:"اشتراك جمعية",
-      token: sess.token,
-      معرف_الجمعية: معرف_الجمعية,
-      عدد_الاسهم: shares
-    });
+    if(وضع === "تعديل"){
+      await post({
+        action:"تعديل اشتراك جمعية",
+        token: sess.token,
+        معرف_الجمعية: معرف_الجمعية,
+        عدد_الاسهم: shares
+      });
+      msg("ok","تم تعديل الاسهم");
+    }else{
+      await post({
+        action:"اشتراك جمعية",
+        token: sess.token,
+        معرف_الجمعية: معرف_الجمعية,
+        عدد_الاسهم: shares
+      });
+      msg("ok","تم تسجيل اشتراكك في الجمعية");
+    }
 
-    msg("ok","تم تسجيل اشتراكك في الجمعية");
     setTimeout(()=>location.href="member.html", 600);
   }catch(e){
     msg("err", e.message);
   }finally{
-    const btn = document.getElementById("btnJoin");
+    const btn = document.getElementById("btnSave");
     قفل = false;
     if(btn) btn.disabled = false;
   }
