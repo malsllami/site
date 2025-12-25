@@ -1,6 +1,14 @@
+(function(){
+  const s = جلسة();
+  if(s.token){
+    if(s.role==="مدير") location.href="admin.html";
+    else location.href="member.html";
+    return;
+  }
+})();
+
 async function register(){
   msg("", "");
-
   try{
     const الاسم = document.getElementById("name").value.trim();
     const رقم_الجوال = document.getElementById("mobile").value.trim();
@@ -21,13 +29,11 @@ async function register(){
 
 async function login(){
   msg("", "");
-
   try{
     const رمز = document.getElementById("pin").value.trim();
     const data = await post({ action:"دخول بالرمز", رمز });
 
     حفظ_جلسة(data.token, data.دور);
-
     location.href = (data.دور==="مدير") ? "admin.html" : "member.html";
   }catch(e){
     msg("err", e.message);
