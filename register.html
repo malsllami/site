@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ar">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>شاشة التسجيل</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <div class="top">
+    <div class="row">
+      <div>
+        <a href="index.html">الشاشة الرئيسية</a>
+        <a href="contact.html">شاشة التواصل</a>
+      </div>
+      <div style="font-weight:900">جمعية عائلية</div>
+      <div>
+        <a href="admin.html">شاشة المدير</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div id="msg"></div>
+
+    <div class="grid">
+      <div class="col-6">
+        <div class="card">
+          <h3>مشترك جديد</h3>
+          <input class="input" id="name" placeholder="الاسم">
+          <div style="height:10px"></div>
+          <input class="input" id="mobile" placeholder="رقم الجوال">
+          <div style="height:12px"></div>
+          <button class="btn" onclick="register()">تسجيل دخول</button>
+          <div id="newpin" style="margin-top:10px;font-weight:800"></div>
+        </div>
+      </div>
+
+      <div class="col-6">
+        <div class="card">
+          <h3>مشترك سابق</h3>
+          <input class="input" id="pin" placeholder="رمز PIN">
+          <div style="height:12px"></div>
+          <button class="btn" onclick="login()">دخول</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/pages/register.js"></script>
+</body>
+</html>
