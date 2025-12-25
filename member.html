@@ -10,12 +10,14 @@
   <div class="top">
     <div class="row">
       <div>
-        <a href="index.html">الشاشة الرئيسية</a>
-        <a href="register.html">شاشة التسجيل</a>
+        <a href="index.html" id="navHome">الشاشة الرئيسية</a>
+        <a href="register.html" id="navRegister">شاشة التسجيل</a>
       </div>
       <div style="font-weight:900">جمعية عائلية</div>
       <div>
-        <a href="#" id="logout">خروج</a>
+        <a href="member.html" id="navMember">شاشة المشتركين</a>
+        <a href="admin.html" id="navAdmin">شاشة المدير</a>
+        <a href="#" id="navLogout" style="display:none">خروج</a>
       </div>
     </div>
   </div>
@@ -37,6 +39,7 @@
   <script src="assets/js/config.js"></script>
   <script src="assets/js/api.js"></script>
   <script src="assets/js/ui.js"></script>
+  <script src="assets/js/auth_ui.js"></script>
   <script src="assets/js/pages/member.js"></script>
 </body>
 </html>
