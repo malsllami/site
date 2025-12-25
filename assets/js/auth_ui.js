@@ -1,4 +1,5 @@
 (function(){
+  // لازم ui.js يكون محمل قبل هذا الملف لأن جلسة() موجودة هناك
   const s = جلسة();
 
   const navRegister = document.getElementById("navRegister");
@@ -6,17 +7,18 @@
   const navAdmin = document.getElementById("navAdmin");
   const navLogout = document.getElementById("navLogout");
 
-  function hide(el){ if(el) el.style.display="none"; }
-  function show(el){ if(el) el.style.display=""; }
+  function hide(el){ if(el) el.style.display = "none"; }
+  function show(el){ if(el) el.style.display = ""; }
 
-  if(s.token){
+  if(s && s.token){
+    // مسجل دخول
     hide(navRegister);
     show(navLogout);
 
-    if(s.role==="مشترك"){
+    if(s.role === "مشترك"){
       show(navMember);
       hide(navAdmin);
-    }else if(s.role==="مدير"){
+    }else if(s.role === "مدير"){
       hide(navMember);
       show(navAdmin);
     }else{
@@ -32,6 +34,7 @@
       };
     }
   }else{
+    // غير مسجل
     show(navRegister);
     hide(navLogout);
     show(navMember);
