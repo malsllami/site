@@ -10,12 +10,14 @@
   <div class="top">
     <div class="row">
       <div>
-        <a href="index.html">الشاشة الرئيسية</a>
-        <a href="register.html">شاشة التسجيل</a>
+        <a href="index.html" id="navHome">الشاشة الرئيسية</a>
+        <a href="register.html" id="navRegister">شاشة التسجيل</a>
       </div>
       <div style="font-weight:900">جمعية عائلية</div>
       <div>
-        <a href="member.html">شاشة المشتركين</a>
+        <a href="member.html" id="navMember">شاشة المشتركين</a>
+        <a href="admin.html" id="navAdmin">شاشة المدير</a>
+        <a href="#" id="navLogout" style="display:none">خروج</a>
       </div>
     </div>
   </div>
@@ -29,25 +31,25 @@
     </div>
 
     <div class="card" id="joinBox" style="display:none">
-      <h3>التسجيل في الجمعية الجديدة</h3>
+      <h3 id="joinTitle">التسجيل في الجمعية الجديدة</h3>
       <div class="grid">
         <div class="col-6">
           <input class="input" id="shares" placeholder="عدد الاسهم مثل 1 او 0.5">
         </div>
         <div class="col-6">
-          <button class="btn" id="btnJoin" onclick="joinSoc()">حفظ وارسال</button>
+          <button class="btn" id="btnSave" onclick="saveShares()">حفظ وارسال</button>
         </div>
         <div class="col-12" style="color:#666">
           ملاحظة, يسمح بنصف سهم كحد ادنى
         </div>
       </div>
     </div>
-
   </div>
 
   <script src="assets/js/config.js"></script>
   <script src="assets/js/api.js"></script>
   <script src="assets/js/ui.js"></script>
+  <script src="assets/js/auth_ui.js"></script>
   <script src="assets/js/pages/society.js"></script>
 </body>
 </html>
