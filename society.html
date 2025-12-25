@@ -15,7 +15,7 @@
       </div>
       <div style="font-weight:900">جمعية عائلية</div>
       <div>
-        <a href="admin.html">شاشة المدير</a>
+        <a href="member.html">شاشة المشتركين</a>
       </div>
     </div>
   </div>
@@ -25,9 +25,24 @@
 
     <div class="card">
       <h3>صفحة الجمعية</h3>
-      <div class="badge">سيتم اكمال الرغبات والتحصيل والتسليم لاحقا</div>
-      <div style="margin-top:10px" id="sid"></div>
+      <div id="socInfo"></div>
     </div>
+
+    <div class="card" id="joinBox" style="display:none">
+      <h3>التسجيل في الجمعية الجديدة</h3>
+      <div class="grid">
+        <div class="col-6">
+          <input class="input" id="shares" placeholder="عدد الاسهم مثل 1 او 0.5">
+        </div>
+        <div class="col-6">
+          <button class="btn" id="btnJoin" onclick="joinSoc()">حفظ وارسال</button>
+        </div>
+        <div class="col-12" style="color:#666">
+          ملاحظة, يسمح بنصف سهم كحد ادنى
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <script src="assets/js/config.js"></script>
