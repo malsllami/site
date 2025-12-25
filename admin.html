@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ar">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>شاشة المدير</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <div class="top">
+    <div class="row">
+      <div>
+        <a href="index.html">الشاشة الرئيسية</a>
+        <a href="register.html">شاشة التسجيل</a>
+      </div>
+      <div style="font-weight:900">جمعية عائلية</div>
+      <div>
+        <a href="#" id="logout">خروج</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div id="msg"></div>
+
+    <div class="card" id="loginBox">
+      <h3>دخول المدير</h3>
+      <input class="input" id="adminPin" placeholder="رمز PIN">
+      <div style="height:12px"></div>
+      <button class="btn" onclick="adminLogin()">دخول</button>
+    </div>
+
+    <div id="adminPanel" style="display:none">
+      <div class="card">
+        <h3>انشاء جمعية جديدة</h3>
+        <div class="grid">
+          <div class="col-6"><input class="input" id="socName" placeholder="اسم الجمعية"></div>
+          <div class="col-6"><input class="input" id="socStart" placeholder="تاريخ البداية مثل 2026-01-01"></div>
+          <div class="col-12"><button class="btn" onclick="createSoc()">انشاء</button></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>المشتركين</h3>
+        <div id="members"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/pages/admin.js"></script>
+</body>
+</html>
