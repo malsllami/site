@@ -21,6 +21,12 @@ function عرض_جمعية(s){
   );
 }
 
+function عرض_زر_انسحاب(show){
+  const x = document.getElementById("btnWithdraw");
+  if(!x) return;
+  x.style.display = show ? "" : "none";
+}
+
 async function تحميل(){
   msg("", "");
   const sid = قراءة_معرف();
@@ -44,19 +50,22 @@ async function تحميل(){
         joinBox.style.display = "";
 
         if(data.مشترك_مسجل){
-          msg("ok","انت مشترك مسبقا في هذه الجمعية, يمكنك تعديل الاسهم طالما الجمعية جديدة");
+          msg("ok","انت مشترك مسبقا, يمكنك تعديل الاسهم او الانسحاب طالما الجمعية جديدة");
           shares.value = String(data.عدد_اسهم_المشترك || "");
           وضع = "تعديل";
-          joinTitle.textContent = "تعديل الاسهم في الجمعية الجديدة";
+          joinTitle.textContent = "تعديل الاسهم او الانسحاب";
           btnSave.textContent = "تعديل";
+          عرض_زر_انسحاب(true);
         }else{
           shares.value = "";
           وضع = "انشاء";
           joinTitle.textContent = "التسجيل في الجمعية الجديدة";
           btnSave.textContent = "حفظ وارسال";
+          عرض_زر_انسحاب(false);
         }
       }else{
         joinBox.style.display = "none";
+        عرض_زر_انسحاب(false);
       }
       return;
     }
@@ -64,6 +73,7 @@ async function تحميل(){
     const data = await get("تفاصيل جمعية", { معرف_الجمعية: sid });
     عرض_جمعية(data.جمعية);
     document.getElementById("joinBox").style.display = "none";
+    عرض_زر_انسحاب(false);
   }catch(e){
     msg("err", e.message);
   }
@@ -102,7 +112,7 @@ async function saveShares(){
         معرف_الجمعية: معرف_الجمعية,
         عدد_الاسهم: shares
       });
-      msg("ok","تم تسجيل اشتراكك في الجمعية");
+      msg("ok","تم التسجيل في الجمعية");
     }
 
     setTimeout(()=>location.href="member.html", 600);
@@ -112,6 +122,40 @@ async function saveShares(){
     const btn = document.getElementById("btnSave");
     قفل = false;
     if(btn) btn.disabled = false;
+  }
+}
+
+async function withdrawSoc(){
+  if(قفل) return;
+  msg("", "");
+
+  const sess = جلسة();
+  if(!sess.token || sess.role!=="مشترك"){
+    msg("err","يجب تسجيل الدخول كمشترك");
+    return;
+  }
+
+  if(!confirm("هل تريد الانسحاب من الجمعية؟")) return;
+
+  try{
+    const btnW = document.getElementById("btnWithdraw");
+    قفل = true;
+    if(btnW) btnW.disabled = true;
+
+    await post({
+      action:"انسحاب جمعية",
+      token: sess.token,
+      معرف_الجمعية: معرف_الجمعية
+    });
+
+    msg("ok","تم الانسحاب من الجمعية");
+    setTimeout(()=>location.href="member.html", 700);
+  }catch(e){
+    msg("err", e.message);
+  }finally{
+    const btnW = document.getElementById("btnWithdraw");
+    قفل = false;
+    if(btnW) btnW.disabled = false;
   }
 }
 
