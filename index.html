@@ -10,14 +10,14 @@
   <div class="top">
     <div class="row">
       <div>
-        <a href="index.html">الشاشة الرئيسية</a>
-        <a href="register.html">شاشة التسجيل</a>
-        <a href="contact.html">شاشة التواصل</a>
+        <a href="index.html" id="navHome">الشاشة الرئيسية</a>
+        <a href="register.html" id="navRegister">شاشة التسجيل</a>
       </div>
       <div style="font-weight:900">جمعية عائلية</div>
       <div>
-        <a href="member.html">شاشة المشتركين</a>
-        <a href="admin.html">شاشة المدير</a>
+        <a href="member.html" id="navMember">شاشة المشتركين</a>
+        <a href="admin.html" id="navAdmin">شاشة المدير</a>
+        <a href="#" id="navLogout" style="display:none">خروج</a>
       </div>
     </div>
   </div>
@@ -27,18 +27,19 @@
 
     <div class="card">
       <h3>ترحيب</h3>
-      <div id="welcome"></div>
+      <div id="welcomeText"></div>
     </div>
 
     <div class="card">
       <h3>الجمعيات</h3>
-      <div class="grid" id="societies"></div>
+      <div class="grid" id="societiesList"></div>
     </div>
   </div>
 
   <script src="assets/js/config.js"></script>
   <script src="assets/js/api.js"></script>
   <script src="assets/js/ui.js"></script>
+  <script src="assets/js/auth_ui.js"></script>
   <script src="assets/js/pages/index.js"></script>
 </body>
 </html>
