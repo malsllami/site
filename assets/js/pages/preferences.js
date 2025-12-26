@@ -7,20 +7,80 @@ function round2(x){
   return Math.round(n * 2) / 2;
 }
 
-function buildTable(months, shares){
+function monthLabelGregorian(yyyyMM){
+  const s = String(yyyyMM || "").trim();
+  const parts = s.split("-");
+  if(parts.length !== 2) return s;
+
+  const y = parts[0];
+  const m = Number(parts[1]);
+
+  const شهور = [
+    "يناير","فبراير","مارس","ابريل","مايو","يونيو",
+    "يوليو","اغسطس","سبتمبر","اكتوبر","نوفمبر","ديسمبر"
+  ];
+
+  if(m >= 1 && m <= 12) return شهور[m-1] + " " + y;
+  return s;
+}
+
+function monthLabelHijriFromYYYYMM(yyyyMM){
+  const s = String(yyyyMM || "").trim();
+  const parts = s.split("-");
+  if(parts.length !== 2) return "";
+
+  const y = Number(parts[0]);
+  const m = Number(parts[1]);
+  if(!(y > 0 && m >= 1 && m <= 12)) return "";
+
+  const d = new Date(y, m - 1, 1);
+
+  try{
+    const fmt = new Intl.DateTimeFormat("ar-SA-u-ca-islamic", {
+      month: "long",
+      year: "numeric"
+    });
+    return fmt.format(d);
+  }catch(e){
+    return "";
+  }
+}
+
+function buildEventMapFromSummary(summary){
+  const map = {};
+  const arr = summary || [];
+  for(const s of arr){
+    const key = String(s.شهر || "").trim();
+    const ev = String(s.مناسبة || "").trim();
+    if(key) map[key] = ev;
+  }
+  return map;
+}
+
+function buildTable(months, shares, eventMap){
   let html = `
     <div style="margin-bottom:10px">عدد اسهمك <b>${esc(shares)}</b></div>
     <table class="table">
       <tr>
         <th>الشهر</th>
+        <th>الشهر الهجري</th>
+        <th>المناسبة</th>
         <th>عدد الاسهم</th>
         <th>النوع</th>
       </tr>
   `;
+
   for(let i=0;i<months.length;i++){
+    const key = String(months[i] || "");
+    const ميلادي = monthLabelGregorian(key);
+    const هجري = monthLabelHijriFromYYYYMM(key);
+    const مناسبة = String((eventMap && eventMap[key]) || "").trim();
+
     html += `
       <tr>
-        <td>${esc(months[i])}</td>
+        <td>${esc(ميلادي)}<div class="small muted">${esc(key)}</div></td>
+        <td>${esc(هجري || "-")}</td>
+        <td>${esc(مناسبة || "-")}</td>
         <td>
           <input class="input" id="m${i+1}" value="0" placeholder="0 او 0.5 او 1">
         </td>
@@ -33,6 +93,7 @@ function buildTable(months, shares){
       </tr>
     `;
   }
+
   html += `</table>`;
   return html;
 }
@@ -92,6 +153,7 @@ function fillExisting(existing, monthCount){
     const soc = data.جمعية;
     const months = data.الاشهر || [];
     const shares = Number(data.عدد_اسهم_المشترك||0);
+    const eventMap = buildEventMapFromSummary(data.ملخص || []);
 
     setHtml("socInfo",
       "اسم الجمعية <b>" + esc(soc.اسم) + "</b><br>" +
@@ -105,10 +167,9 @@ function fillExisting(existing, monthCount){
       return;
     }
 
-    setHtml("prefBox", buildTable(months, shares));
+    setHtml("prefBox", buildTable(months, shares, eventMap));
     fillExisting(data.رغبات || null, months.length);
 
-    // تحذيرات عامة الجمعية
     setHtml("warnings", renderWarnings(data.ملخص || [], months));
 
     function updateTotalHint(){
