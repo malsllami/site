@@ -1,100 +1,183 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
+  <title>لوحة المدير</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>شاشة المدير</title>
-  <link rel="stylesheet" href="assets/css/styles.css">
+
+  <link rel="stylesheet" href="assets/css/style.css">
+
+  <style>
+    body {
+      font-family: Tahoma, Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      direction: rtl;
+    }
+
+    header {
+      background: #2f8f6b;
+      color: #fff;
+      padding: 16px;
+      font-size: 20px;
+    }
+
+    .container {
+      padding: 16px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .card-title {
+      font-size: 18px;
+      margin-bottom: 12px;
+      font-weight: bold;
+    }
+
+    .btn {
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      background: #2f8f6b;
+      color: #fff;
+    }
+
+    .btn.gray {
+      background: #ccc;
+      color: #333;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+
+    .tab {
+      padding: 8px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      background: #e0e0e0;
+      font-size: 14px;
+    }
+
+    .tab.active {
+      background: #2f8f6b;
+      color: #fff;
+    }
+
+    .month-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill,minmax(140px,1fr));
+      gap: 12px;
+    }
+
+    .month-card {
+      border-radius: 12px;
+      padding: 12px;
+      cursor: pointer;
+      color: #333;
+    }
+
+    .month-normal { background:#e8f7ef; }
+    .month-near   { background:#fff3cd; }
+    .month-limit  { background:#ffe0b2; }
+    .month-over   { background:#f8d7da; }
+
+    .month-card h4 {
+      margin: 0 0 6px 0;
+      font-size: 14px;
+    }
+
+    .accordion {
+      margin-top: 12px;
+      border-top: 1px dashed #ccc;
+      padding-top: 12px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      padding: 6px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 14px;
+    }
+
+    .row:last-child {
+      border-bottom: none;
+    }
+
+    .checkbox {
+      transform: scale(1.2);
+    }
+
+    @media (max-width: 600px) {
+      header {
+        font-size: 18px;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-  <div class="top">
-    <div class="row">
-      <div class="nav">
-        <a href="index.html">الشاشة الرئيسية</a>
-        <a href="member.html" id="navMember" style="display:none">شاشة المشتركين</a>
-        <a href="admin.html" id="navAdmin" style="display:none">شاشة المدير</a>
-        <a href="register.html" id="navRegister">شاشة التسجيل</a>
-      </div>
+<header>
+  لوحة المدير
+</header>
 
-      <div class="brand">جمعية عائلية</div>
+<div class="container">
 
-      <div class="nav">
-        <a href="#" id="logout" style="display:none">خروج</a>
-      </div>
-    </div>
+  <!-- لوحة التحكم -->
+  <div class="card" id="dashboard">
+    <div class="card-title">لوحة التحكم</div>
+
+    <button class="btn" onclick="showSocieties()">الجمعيات</button>
+    <button class="btn" onclick="showMembers()">المشتركين</button>
   </div>
 
-  <div class="container">
-    <div id="msg"></div>
+  <!-- تفاصيل جمعية -->
+  <div class="card" id="societyView" style="display:none">
+    <div class="card-title" id="societyName"></div>
 
-    <div class="card" id="loginBox">
-      <h3>دخول المدير</h3>
-      <input class="input" id="adminPin" placeholder="رمز PIN للمدير">
-      <div class="mt12 align-end">
-        <button class="btn" id="btnAdminLogin">دخول</button>
-      </div>
-      <div class="note">هذه الصفحة مخصصة للمدير فقط</div>
+    <div id="societyInfo"></div>
+
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('months')">الرغبات</div>
+      <div class="tab" onclick="switchTab('collection')">التحصيل</div>
+      <div class="tab" onclick="switchTab('delivery')">التسليم</div>
     </div>
 
-    <div id="adminPanel" style="display:none">
-      <div class="card">
-        <h3>لوحة المدير</h3>
-        <div class="note">اختر قسم للتنقل</div>
-
-        <div class="mt12" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-start">
-          <button class="btn" id="tabSocBtn">الجمعيات</button>
-          <button class="btn" id="tabMemBtn">المشتركين</button>
-          <button class="btn" id="tabNewBtn">انشاء جمعية</button>
-        </div>
-      </div>
-
-      <div class="card" id="tabSoc">
-        <h3>الجمعيات</h3>
-
-        <div class="note">يعرض بطاقات للجمعيات الجديدة والنشطة فقط, وباقي الجمعيات في قائمة منسدلة</div>
-
-        <div id="socCards" class="mt12"></div>
-
-        <div class="mt12">
-          <label class="small">كل الجمعيات</label>
-          <select class="input" id="socSelect"></select>
-        </div>
-
-        <div id="socDetails" class="mt12"></div>
-      </div>
-
-      <div class="card" id="tabMem" style="display:none">
-        <h3>المشتركين</h3>
-        <div id="members"></div>
-      </div>
-
-      <div class="card" id="tabNew" style="display:none">
-        <h3>انشاء جمعية جديدة</h3>
-        <div class="note">اختر تاريخ البداية من التقويم</div>
-
-        <div class="mt12" style="display:flex;gap:10px;flex-wrap:wrap">
-          <div style="flex:1;min-width:220px">
-            <input class="input" id="socName" placeholder="اسم الجمعية">
-          </div>
-
-          <div style="flex:1;min-width:220px">
-            <input class="input" id="socStart" type="date" placeholder="تاريخ البداية">
-            <div class="note">سيتم الحفظ بصيغة yyyy-mm-dd تلقائيا</div>
-          </div>
-        </div>
-
-        <div class="mt12 align-end">
-          <button class="btn" id="btnCreateSoc">انشاء</button>
-        </div>
-      </div>
-
+    <!-- تبويب الرغبات -->
+    <div id="tab-months">
+      <div class="month-grid" id="monthsGrid"></div>
     </div>
+
+    <!-- تبويب التحصيل -->
+    <div id="tab-collection" style="display:none">
+      <div class="month-grid" id="collectionGrid"></div>
+    </div>
+
+    <!-- تبويب التسليم -->
+    <div id="tab-delivery" style="display:none">
+      <div class="month-grid" id="deliveryGrid"></div>
+    </div>
+
+    <button class="btn gray" onclick="backToDashboard()">رجوع</button>
   </div>
 
-  <script src="assets/js/config.js"></script>
-  <script src="assets/js/api.js"></script>
-  <script src="assets/js/ui.js"></script>
-  <script src="assets/js/pages/admin.js"></script>
+</div>
+
+<script src="assets/js/api.js"></script>
+<script src="assets/js/admin.js"></script>
+
 </body>
 </html>
