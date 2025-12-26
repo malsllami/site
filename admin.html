@@ -13,7 +13,9 @@
         <a href="index.html" id="navHome">الشاشة الرئيسية</a>
         <a href="register.html" id="navRegister">شاشة التسجيل</a>
       </div>
-      <div style="font-weight:900">جمعية عائلية</div>
+
+      <div class="brand">جمعية عائلية</div>
+
       <div>
         <a href="member.html" id="navMember">شاشة المشتركين</a>
         <a href="admin.html" id="navAdmin">شاشة المدير</a>
@@ -25,11 +27,13 @@
   <div class="container">
     <div id="msg"></div>
 
+    <!-- دخول المدير -->
     <div class="card" id="loginBox">
       <h3>دخول المدير</h3>
       <div class="grid">
         <div class="col-6">
-          <input class="input" id="adminPin" placeholder="رمز PIN للمدير">
+          <input class="input" id="adminPin" placeholder="رمز PIN للمدير" inputmode="numeric">
+          <div class="note">الدخول للمدير فقط</div>
         </div>
         <div class="col-6">
           <button class="btn" onclick="adminLogin()">دخول</button>
@@ -37,31 +41,124 @@
       </div>
     </div>
 
+    <!-- لوحة المدير -->
     <div id="adminPanel" style="display:none">
+
+      <!-- إنشاء جمعية جديدة -->
       <div class="card">
         <h3>انشاء جمعية جديدة</h3>
         <div class="grid">
           <div class="col-6">
-            <input class="input" id="socName" placeholder="اسم الجمعية">
+            <div class="pillLabel">اسم الجمعية</div>
+            <input class="input" id="socName" placeholder="مثال جمعية 1">
           </div>
+
           <div class="col-6">
-            <input class="input" id="socStart" placeholder="تاريخ البداية مثل 2026-01-01">
+            <div class="pillLabel">تاريخ البداية</div>
+            <!-- المطلوب: تقويم -->
+            <input class="input" id="socStart" type="date">
           </div>
-          <div class="col-12">
+
+          <div class="col-12 align-end mt12">
             <button class="btn" id="btnCreate" onclick="createSoc()">انشاء</button>
+          </div>
+        </div>
+
+        <div class="note">
+          يمنع تكرار اسم الجمعية, ويمنع تكرار تاريخ البداية او نفس المدة
+        </div>
+      </div>
+
+      <!-- الجمعيات -->
+      <div class="card">
+        <div class="cardHead">
+          <h3 style="margin:0">الجمعيات</h3>
+          <div class="small muted" id="socCount"></div>
+        </div>
+        <div class="grid" id="societiesAdmin"></div>
+      </div>
+
+      <!-- تفاصيل الجمعية: تظهر عند اختيار جمعية -->
+      <div class="card" id="societyDetailsCard" style="display:none">
+        <div class="cardHead">
+          <div>
+            <h3 style="margin:0" id="socTitle">تفاصيل الجمعية</h3>
+            <div class="small muted" id="socMeta"></div>
+          </div>
+          <div class="align-end">
+            <button class="btn btn2" onclick="closeSocietyDetails()">إغلاق</button>
+          </div>
+        </div>
+
+        <!-- تبويبات داخل الجمعية -->
+        <div class="tabs mt12">
+          <button class="tabBtn active" id="tabBtnMonths" onclick="switchSocTab('months')">الأشهر</button>
+          <button class="tabBtn" id="tabBtnMembers" onclick="switchSocTab('members')">الأعضاء</button>
+          <button class="tabBtn" id="tabBtnChanges" onclick="switchSocTab('changes')">التغييرات</button>
+          <button class="tabBtn" id="tabBtnCollection" onclick="switchSocTab('collection')">التحصيل</button>
+          <button class="tabBtn" id="tabBtnDelivery" onclick="switchSocTab('delivery')">التسليم</button>
+        </div>
+
+        <!-- الأشهر -->
+        <div id="socTabMonths" class="mt12">
+          <div class="note">
+            بطاقات 10 شهور, اضغط على أي شهر لعرض تفاصيل الشهر
+          </div>
+          <div class="monthsGrid" id="monthsGridAdmin"></div>
+
+          <div class="monthPanel" id="monthPanel" style="display:none">
+            <div class="divider"></div>
+            <div class="cardHead">
+              <div>
+                <div class="pillLabel" id="monthTitle">تفاصيل الشهر</div>
+                <div class="small muted" id="monthMeta"></div>
+              </div>
+              <div class="align-end">
+                <button class="btn btn2" onclick="closeMonthPanel()">إغلاق</button>
+              </div>
+            </div>
+
+            <div id="monthBody" class="mt12"></div>
+          </div>
+        </div>
+
+        <!-- الأعضاء -->
+        <div id="socTabMembers" class="mt12" style="display:none">
+          <div class="note">
+            جدول الأعضاء يوضح توزيع الأسهم على الأشهر من 1 الى 10
+          </div>
+          <div id="socMembersTable"></div>
+        </div>
+
+        <!-- التغييرات -->
+        <div id="socTabChanges" class="mt12" style="display:none">
+          <div class="note">
+            يظهر المنسحبين أو من قام بتعديل الأسهم, مع تاريخ أول اشتراك وآخر تعديل
+          </div>
+          <div id="socChangesTable"></div>
+        </div>
+
+        <!-- التحصيل: هيكل فقط الآن -->
+        <div id="socTabCollection" class="mt12" style="display:none">
+          <div class="warn warn-gray">
+            قسم التحصيل جاهز للمرحلة القادمة, سيتم بناء بطاقات كل شهر مع تشيك بوكس ومجموع يطابق إجمالي التحصيل 100٪
+          </div>
+        </div>
+
+        <!-- التسليم: هيكل فقط الآن -->
+        <div id="socTabDelivery" class="mt12" style="display:none">
+          <div class="warn warn-gray">
+            قسم التسليم جاهز للمرحلة القادمة, ممنوع التسليم الجزئي, تشيك بوكس للمستحقين لهذا الشهر فقط, ومجموع يطابق إجمالي التسليم 100٪
           </div>
         </div>
       </div>
 
-      <div class="card">
-        <h3>الجمعيات</h3>
-        <div class="grid" id="societiesAdmin"></div>
-      </div>
-
+      <!-- المشتركين -->
       <div class="card">
         <h3>المشتركين</h3>
         <div id="members"></div>
       </div>
+
     </div>
   </div>
 
