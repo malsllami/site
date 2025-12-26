@@ -1,184 +1,70 @@
 <!doctype html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>لوحة المدير</title>
-
-  <link rel="stylesheet" href="assets/css/styles.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>شاشة المدير</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
 </head>
+<body>
+  <div class="top">
+    <div class="row">
+      <div>
+        <a href="index.html" id="navHome">الشاشة الرئيسية</a>
+        <a href="register.html" id="navRegister">شاشة التسجيل</a>
+      </div>
+      <div style="font-weight:900">جمعية عائلية</div>
+      <div>
+        <a href="member.html" id="navMember">شاشة المشتركين</a>
+        <a href="admin.html" id="navAdmin">شاشة المدير</a>
+        <a href="#" id="navLogout" style="display:none">خروج</a>
+      </div>
+    </div>
+  </div>
 
-<body class="page-admin">
-  <!-- شريط علوي -->
-  <header class="topbar">
-    <div class="topbar__inner">
+  <div class="container">
+    <div id="msg"></div>
 
-      <!-- يمين, روابط ثابتة -->
-      <nav class="topbar__nav topbar__nav--right" aria-label="روابط رئيسية">
-        <a class="topbar__link" href="index.html">الشاشة الرئيسية</a>
-        <a class="topbar__link" href="member.html">شاشة المشتركين</a>
-        <a class="topbar__link topbar__link--active" href="admin.html">شاشة المدير</a>
-      </nav>
+    <div class="card" id="loginBox">
+      <h3>دخول المدير</h3>
+      <div class="grid">
+        <div class="col-6">
+          <input class="input" id="adminPin" placeholder="رمز PIN للمدير">
+        </div>
+        <div class="col-6">
+          <button class="btn" onclick="adminLogin()">دخول</button>
+        </div>
+      </div>
+    </div>
 
-      <!-- العنوان بالمنتصف -->
-      <div class="topbar__title" aria-label="عنوان الصفحة">
-        جمعية عائلية
+    <div id="adminPanel" style="display:none">
+      <div class="card">
+        <h3>انشاء جمعية جديدة</h3>
+        <div class="grid">
+          <div class="col-6">
+            <input class="input" id="socName" placeholder="اسم الجمعية">
+          </div>
+          <div class="col-6">
+            <input class="input" id="socStart" placeholder="تاريخ البداية مثل 2026-01-01">
+          </div>
+          <div class="col-12">
+            <button class="btn" id="btnCreate" onclick="createSoc()">انشاء</button>
+          </div>
+        </div>
       </div>
 
-      <!-- يسار, تحديث, تواصل, خروج -->
-      <nav class="topbar__nav topbar__nav--left" aria-label="روابط مساعدة">
-        <button class="topbar__link topbar__btnlink" id="refreshBtn" type="button">تحديث</button>
-        <a class="topbar__link" href="contact.html">شاشة التواصل</a>
-        <a class="topbar__link" href="#" id="logout">خروج</a>
-      </nav>
+      <div class="card">
+        <h3>الجمعيات</h3>
+        <div class="grid" id="societiesAdmin"></div>
+      </div>
 
+      <div class="card">
+        <h3>المشتركين</h3>
+        <div id="members"></div>
+      </div>
     </div>
-  </header>
+  </div>
 
-  <main class="page">
-    <section class="container">
-      <!-- رسائل عامة -->
-      <div id="msg" class="msg" aria-live="polite"></div>
-
-      <!-- لوحة التحكم -->
-      <section class="card">
-        <h2 class="card__title">لوحة التحكم</h2>
-
-        <div class="segmented">
-          <button id="tabSocieties" class="segmented__btn segmented__btn--active" type="button">
-            الجمعيات
-          </button>
-          <button id="tabMembers" class="segmented__btn" type="button">
-            المشتركين
-          </button>
-        </div>
-      </section>
-
-      <!-- ====== قسم الجمعيات ====== -->
-      <section id="societiesPanel" class="card">
-        <div class="card__head">
-          <h2 class="card__title">الجمعيات</h2>
-          <div class="card__meta" id="societiesHint"></div>
-        </div>
-
-        <!-- قائمة بطاقات الجمعيات -->
-        <div id="societiesList" class="cardsGrid" aria-label="قائمة الجمعيات"></div>
-
-        <!-- تفاصيل جمعية محددة, تظهر عند اختيار بطاقة -->
-        <div id="societyDetails" class="societyDetails hidden" aria-label="تفاصيل الجمعية">
-          <div class="divider"></div>
-
-          <div class="societyDetails__head">
-            <div>
-              <h3 class="societyDetails__title" id="societyTitle">تفاصيل الجمعية</h3>
-              <div class="societyDetails__sub" id="societySub"></div>
-            </div>
-
-            <div class="societyDetails__actions">
-              <button class="btn btn--ghost" type="button" id="closeSocietyDetails">إغلاق</button>
-            </div>
-          </div>
-
-          <!-- ملخص الجمعية -->
-          <section class="miniCard">
-            <h4 class="miniCard__title">ملخص</h4>
-            <div id="societySummary" class="kvGrid"></div>
-          </section>
-
-          <!-- بطاقات الشهور -->
-          <section class="miniCard">
-            <div class="miniCard__head">
-              <h4 class="miniCard__title">أشهر الجمعية</h4>
-              <div class="miniCard__hint">
-                تظهر 10 بطاقات, كل بطاقة تمثل شهر, اللون لاحقا يتغير حسب الازدحام
-              </div>
-            </div>
-
-            <div id="monthsGrid" class="monthsGrid" aria-label="بطاقات الشهور"></div>
-
-            <!-- تفاصيل شهر -->
-            <div id="monthDetails" class="monthDetails hidden" aria-label="تفاصيل الشهر">
-              <div class="divider"></div>
-
-              <div class="monthDetails__head">
-                <div>
-                  <h4 class="monthDetails__title" id="monthTitle">تفاصيل الشهر</h4>
-                  <div class="monthDetails__sub" id="monthSub"></div>
-                </div>
-
-                <div class="monthDetails__actions">
-                  <button class="btn btn--ghost" type="button" id="closeMonthDetails">إغلاق</button>
-                </div>
-              </div>
-
-              <!-- مكان عرض بيانات الشهر, مشتركين, أسهم, متبقي, إلخ -->
-              <div id="monthBody" class="monthBody"></div>
-            </div>
-          </section>
-
-          <!-- التحصيل, هيكل فقط -->
-          <section class="miniCard">
-            <div class="miniCard__head">
-              <h4 class="miniCard__title">التحصيل</h4>
-              <div class="miniCard__hint">
-                هذا قسم جاهز للمرحلة القادمة, داخل كل شهر سيكون قائمة المشتركين, تشيك بوكس, ملاحظات, ومجموع يطابق إجمالي التحصيل
-              </div>
-            </div>
-
-            <div class="placeholder">
-              <div class="placeholder__line">لم يتم تفعيل اكشنات التحصيل بعد</div>
-              <div class="placeholder__line">سيتم ربطه لاحقا مع السجل والاشتراكات والرغبات</div>
-            </div>
-          </section>
-
-          <!-- التسليم, هيكل فقط -->
-          <section class="miniCard">
-            <div class="miniCard__head">
-              <h4 class="miniCard__title">التسليم</h4>
-              <div class="miniCard__hint">
-                هذا قسم جاهز للمرحلة القادمة, التسليم ممنوع يكون جزئي, تشيك بوكس لكل مستحق في الشهر, والمجموع يطابق إجمالي التسليم 100٪
-              </div>
-            </div>
-
-            <div class="placeholder">
-              <div class="placeholder__line">لم يتم تفعيل اكشنات التسليم بعد</div>
-              <div class="placeholder__line">سيتم حصر المستحقين حسب رغبات الشهر فقط</div>
-            </div>
-          </section>
-        </div>
-      </section>
-
-      <!-- ====== قسم المشتركين ====== -->
-      <section id="membersPanel" class="card hidden">
-        <div class="card__head">
-          <h2 class="card__title">المشتركين</h2>
-          <div class="card__meta" id="membersHint"></div>
-        </div>
-
-        <div class="tableWrap" aria-label="قائمة المشتركين">
-          <table class="table">
-            <thead>
-              <tr>
-                <th>الاسم</th>
-                <th>الجوال</th>
-                <th>PIN</th>
-                <th>نسخ</th>
-                <th>تفاصيل</th>
-              </tr>
-            </thead>
-            <tbody id="membersTbody"></tbody>
-          </table>
-        </div>
-
-        <div class="note">
-          زر التفاصيل مجرد مكان جاهز, صفحة تفاصيل المشترك نجهزها لاحقا حسب اتفاقنا
-        </div>
-      </section>
-
-    </section>
-  </main>
-
-  <!-- ملفات الجافا سكربت, لا تغيير -->
   <script src="assets/js/config.js"></script>
   <script src="assets/js/api.js"></script>
   <script src="assets/js/ui.js"></script>
