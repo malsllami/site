@@ -244,3 +244,170 @@ button:active{ transform:scale(.99); }
 
   .cellSub{ display:none; } /* اخفاء السطر الصغير للجوال لتخفيف الزحمة */
 }
+
+
+/* ===== إضافات خاصة بلوحة المدير, آمنة ولا تؤثر على باقي الصفحات ===== */
+
+.cardHead{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.pillLabel{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:8px 12px;
+  border-radius:999px;
+  background:#f5fbfc;
+  border:1px solid var(--border);
+  font-weight:900;
+  font-size:13px;
+  color:var(--text);
+  margin-bottom:8px;
+}
+
+.pill{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:8px 12px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  background:#fff;
+  font-weight:800;
+  font-size:13px;
+  color:var(--text);
+}
+
+.tabs{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.tabBtn{
+  background:#ffffff;
+  border:1px solid var(--border);
+  color:var(--text);
+  padding:10px 14px;
+  border-radius:999px;
+  cursor:pointer;
+  font-weight:900;
+}
+
+.tabBtn.active{
+  background:rgba(14,111,127,.12);
+  border-color:#b9dfe6;
+}
+
+.btn2{
+  background:#ffffff;
+  border:1px solid var(--border);
+  color:var(--text);
+}
+
+.divider{
+  height:1px;
+  background:#eee;
+  margin:14px 0;
+}
+
+.monthsGrid{
+  display:grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap:12px;
+  margin-top:12px;
+}
+
+.monthCard{
+  border-radius:18px;
+  border:1px solid var(--border);
+  background:#fff;
+  box-shadow:var(--shadow);
+  padding:14px;
+  cursor:pointer;
+  transition:transform .12s ease;
+}
+
+.monthCard:active{ transform:scale(.99); }
+
+.monthHead{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+}
+
+.monthTitle{ font-weight:1000; }
+.monthKey{ font-size:12px; color:var(--muted); }
+
+.monthStats{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.monthHint{
+  margin-top:10px;
+  font-size:12px;
+  color:var(--muted);
+  font-weight:800;
+}
+
+/* ألوان حالة الشهر */
+.month-normal{ background:#ffffff; }
+.month-near{ background:#fff7e6; border-color:#ffe0b3; }
+.month-limit{ background:#fff1f1; border-color:#ffcccc; }
+.month-over{ background:#ffeaea; border-color:#ffb3b3; }
+
+.socCard{
+  border-radius:18px;
+  border:1px solid var(--border);
+  background:#fff;
+  box-shadow:var(--shadow);
+  padding:14px;
+  cursor:pointer;
+}
+
+.socHead{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.socTitle{
+  font-weight:1000;
+  font-size:16px;
+}
+
+.socMeta, .socStats{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:10px;
+}
+
+.socHint{
+  margin-top:10px;
+  font-size:12px;
+  color:var(--muted);
+  font-weight:900;
+}
+
+.socActive{ border-color:#bfead0; background:#f4fff8; }
+.socClosed{ border-color:#e5e5e5; background:#fafafa; }
+.socNew{ border-color:#ffd0e3; background:#fff5fa; }
+
+@media (max-width: 900px){
+  .monthsGrid{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 600px){
+  .monthsGrid{ grid-template-columns: repeat(1, minmax(0, 1fr)); }
+}
