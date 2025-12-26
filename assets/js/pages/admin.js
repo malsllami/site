@@ -1,528 +1,444 @@
-let ADMIN = {
-  token: "",
-  societyId: "",
-  societyData: null
-};
+// assets/js/pages/admin.js  , انسخه واستبدله بالكامل
+let adminToken = "";
+let cachedSocieties = [];
+let currentSocietyId = "";
 
-function fmtDate(d){
-  return String(d || "").trim();
+function showMsg(type, text){
+  msg(type, text);
 }
 
-function setShow(id, yes){
-  const el = document.getElementById(id);
-  if(!el) return;
-  el.style.display = yes ? "" : "none";
+function hide(el){ if(el) el.style.display = "none"; }
+function show(el){ if(el) el.style.display = ""; }
+
+function fmtNum(n){
+  const x = Number(n || 0);
+  if(!isFinite(x)) return "0";
+  return (Math.round(x * 2) / 2).toString();
 }
 
-function pill(text){
-  return `<span class="pill">${esc(text || "")}</span>`;
+function sumArr(arr){
+  return arr.reduce((s,x)=> s + Number(x||0), 0);
 }
 
-function badgeState(state){
-  if(state === "نشطة") return `<span class="badge green">نشطة</span>`;
-  if(state === "مغلقة") return `<span class="badge gray">مغلقة</span>`;
-  return `<span class="badge pink">جديدة</span>`;
+function calcMonthStatus(monthIndex, monthlyCollection, monthsTotals){
+  // monthsTotals: [{deliveryAmount, available, ratio, surplusEnd}]
+  const row = monthsTotals[monthIndex] || null;
+  if(!row) return "month-ok";
+
+  if(row.deliveryAmount > row.available) return "month-over";
+  if(row.deliveryAmount === row.available) return "month-limit";
+  if(row.ratio >= 0.75) return "month-near";
+  return "month-ok";
 }
 
-function money(x){
-  const n = Number(x || 0);
-  if(!isFinite(n)) return "0";
-  return String(Math.round(n * 100) / 100);
+function badgeHtml(state){
+  return badge(state);
 }
 
-/* ====== بدء الصفحة ====== */
-(function init(){
-  const s = جلسة();
+function switchTab(tab, ev){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  if(ev && ev.target) ev.target.classList.add("active");
 
-  // إظهار زر الخروج لو في جلسة
-  if(s && s.token){
-    document.getElementById("navLogout").style.display = "";
-  }
+  const a = document.getElementById("tab-months");
+  const b = document.getElementById("tab-members");
+  const c = document.getElementById("tab-changes");
 
-  // لو المستخدم مدير, ادخل مباشرة
-  if(s && s.token && s.role === "مدير"){
-    ADMIN.token = s.token;
-    document.getElementById("loginBox").style.display = "none";
-    document.getElementById("adminPanel").style.display = "";
-    loadAdminDashboard();
-    return;
-  }
+  if(a) a.style.display = (tab==="months") ? "" : "none";
+  if(b) b.style.display = (tab==="members") ? "" : "none";
+  if(c) c.style.display = (tab==="changes") ? "" : "none";
+}
 
-  // لو مشترك, امنع دخول المدير
-  if(s && s.token && s.role === "مشترك"){
-    msg("err", "لا يمكن الدخول لشاشة المدير بحساب مشترك");
-    document.getElementById("loginBox").style.display = "none";
-    document.getElementById("adminPanel").style.display = "none";
-    return;
-  }
+function backToDashboard(){
+  currentSocietyId = "";
+  show(document.getElementById("dashboard"));
+  hide(document.getElementById("societyView"));
+  showMsg("", "");
+}
 
-  // زائر, يظهر صندوق الدخول
-  document.getElementById("loginBox").style.display = "";
-  document.getElementById("adminPanel").style.display = "none";
-})();
-
-/* ====== دخول المدير ====== */
 async function adminLogin(){
-  msg("", "");
+  showMsg("", "");
+  const pin = (document.getElementById("adminPin").value || "").trim();
+  if(!pin){
+    showMsg("err", "رمز PIN مطلوب");
+    return;
+  }
+
   try{
-    const pin = document.getElementById("adminPin").value.trim();
-    if(!pin){
-      msg("err","رمز PIN مطلوب");
-      return;
-    }
-
     const data = await post({ action:"دخول بالرمز", رمز: pin });
-
     if(String(data.دور) !== "مدير"){
-      msg("err","هذا الرمز ليس للمدير");
+      showMsg("err", "هذا الرمز ليس لمدير");
       return;
     }
 
     حفظ_جلسة(data.token, "مدير");
-    ADMIN.token = data.token;
-
-    document.getElementById("loginBox").style.display = "none";
-    document.getElementById("adminPanel").style.display = "";
-    msg("ok","تم الدخول بنجاح");
-
-    await loadAdminDashboard();
+    location.reload();
 
   }catch(e){
-    msg("err", e.message || String(e));
+    showMsg("err", e.message || String(e));
   }
 }
 
-/* ====== إنشاء جمعية ====== */
-async function createSoc(){
-  msg("", "");
+async function bootstrap(){
+  const s = جلسة();
+  adminToken = (s && s.token) ? s.token : "";
+
+  const loginBox = document.getElementById("loginBox");
+  const adminPanel = document.getElementById("adminPanel");
+
+  if(!adminToken || s.role !== "مدير"){
+    show(loginBox);
+    hide(adminPanel);
+    return;
+  }
+
+  hide(loginBox);
+  show(adminPanel);
+
+  await loadAdminData();
+}
+
+async function loadAdminData(){
+  showMsg("", "");
+
   try{
-    if(!ADMIN.token){
-      msg("err","غير مسجل دخول كمدير");
-      return;
-    }
-
-    const اسم_الجمعية = document.getElementById("socName").value.trim();
-    const تاريخ_البداية = document.getElementById("socStart").value.trim(); // yyyy-mm-dd من input date
-
-    if(!اسم_الجمعية){
-      msg("err","اسم الجمعية مطلوب");
-      return;
-    }
-    if(!تاريخ_البداية){
-      msg("err","تاريخ البداية مطلوب");
-      return;
-    }
-
-    await get("انشاء جمعية", {
-      token: ADMIN.token,
-      اسم_الجمعية,
-      تاريخ_البداية
-    });
-
-    msg("ok","تم انشاء الجمعية");
-    document.getElementById("socName").value = "";
-    document.getElementById("socStart").value = "";
-
-    await loadAdminDashboard();
-
+    const data = await get("معلومات مدير", { token: adminToken });
+    cachedSocieties = data.جمعيات || [];
+    renderSocieties(cachedSocieties);
+    renderMembers(data.مشتركين || []);
   }catch(e){
-    msg("err", e.message || String(e));
+    showMsg("err", e.message || String(e));
   }
 }
 
-/* ====== تحميل لوحة المدير ====== */
-async function loadAdminDashboard(){
-  try{
-    const data = await get("معلومات مدير", { token: ADMIN.token });
-    const societies = data.جمعيات || [];
-    const members = data.مشتركين || [];
-
-    renderSocieties(societies);
-    renderMembers(members);
-
-  }catch(e){
-    msg("err", e.message || String(e));
-  }
-}
-
-/* ====== عرض الجمعيات كبطاقات ====== */
 function renderSocieties(arr){
   const box = document.getElementById("societiesAdmin");
-  const count = document.getElementById("socCount");
-
-  if(count) count.textContent = "عدد الجمعيات " + (arr.length || 0);
+  if(!box) return;
 
   if(!arr.length){
     box.innerHTML = `<div class="col-12"><div class="warn warn-gray">لا توجد جمعيات</div></div>`;
     return;
   }
 
-  // عرض كل الجمعيات كبطاقات, داخل لوحة المدير
   box.innerHTML = arr.map(s=>{
-    const st = String(s.حالة || "جديدة");
-    const cls = st === "نشطة" ? "socCard socActive" : (st === "مغلقة" ? "socCard socClosed" : "socCard socNew");
+    const title = esc(s.اسم || "");
+    const id = esc(s.معرف || "");
+    const st = esc(s.تاريخ_البداية || "");
+    const en = esc(s.تاريخ_النهاية || "");
+    const members = esc(s.عدد_المشتركين || 0);
+    const shares = esc(s.عدد_الاسهم || 0);
+    const total = esc(s.اجمالي_القيمة || 0);
 
     return `
       <div class="col-4">
-        <div class="${cls}" onclick="openSocietyDetails('${esc(String(s.معرف))}')">
-          <div class="socHead">
-            <div class="socTitle">${esc(s.اسم || "")}</div>
-            <div>${badgeState(st)}</div>
+        <div class="soc">
+          <div class="socTop">
+            <div style="font-weight:900">${title}</div>
+            ${badgeHtml(s.حالة)}
           </div>
-
-          <div class="socMeta">
-            <div>${pill("البداية " + fmtDate(s.تاريخ_البداية))}</div>
-            <div>${pill("النهاية " + fmtDate(s.تاريخ_النهاية))}</div>
+          <div class="socBody">
+            <div>تاريخ البداية ${st}</div>
+            <div>تاريخ النهاية ${en}</div>
+            <div>عدد المشتركين ${members}</div>
+            <div>عدد الاسهم ${shares}</div>
+            <div>قيمة الجمعية الاجمالي ${total}</div>
           </div>
-
-          <div class="socStats">
-            <div>${pill("المشتركين " + (s.عدد_المشتركين || 0))}</div>
-            <div>${pill("الأسهم " + (s.عدد_الاسهم || 0))}</div>
-            <div>${pill("الإجمالي " + money(s.اجمالي_القيمة || 0))}</div>
+          <div class="socActions">
+            <button class="btn" onclick="openSociety('${id}')">فتح</button>
           </div>
-
-          ${st === "جديدة" ? `<div class="socHint">اضغط لفتح التفاصيل</div>` : `<div class="socHint">اضغط لعرض التفاصيل</div>`}
         </div>
       </div>
     `;
   }).join("");
 }
 
-/* ====== فتح تفاصيل جمعية ====== */
-async function openSocietyDetails(sid){
-  msg("", "");
-  try{
-    ADMIN.societyId = String(sid || "").trim();
-    if(!ADMIN.societyId){
-      msg("err","معرف الجمعية غير صحيح");
-      return;
-    }
-
-    // جلب تفاصيل لوحة جمعية للمدير من سكربت قوقل
-    const data = await get("لوحة جمعية للمدير", {
-      token: ADMIN.token,
-      معرف_الجمعية: ADMIN.societyId
-    });
-
-    ADMIN.societyData = data;
-
-    const s = data.جمعية || {};
-    document.getElementById("socTitle").textContent = "تفاصيل " + (s.اسم || "");
-    document.getElementById("socMeta").innerHTML =
-      `الحالة ${pill(s.حالة || "")} ` +
-      `${pill("البداية " + fmtDate(s.تاريخ_البداية))} ` +
-      `${pill("النهاية " + fmtDate(s.تاريخ_النهاية))}`;
-
-    // إظهار كرت التفاصيل
-    document.getElementById("societyDetailsCard").style.display = "";
-
-    // افتراضي على تبويب الأشهر
-    switchSocTab("months");
-
-    // بناء بطاقات الشهور
-    buildMonthCards(data);
-
-    // بناء جدول الأعضاء
-    buildMembersTable(data);
-
-    // بناء جدول التغييرات
-    buildChangesTable(data);
-
-    // اغلاق لوحة الشهر المفتوحة
-    closeMonthPanel();
-
-    // تمرير للمكان
-    document.getElementById("societyDetailsCard").scrollIntoView({ behavior:"smooth", block:"start" });
-
-  }catch(e){
-    msg("err", e.message || String(e));
-  }
-}
-
-function closeSocietyDetails(){
-  ADMIN.societyId = "";
-  ADMIN.societyData = null;
-  document.getElementById("societyDetailsCard").style.display = "none";
-  closeMonthPanel();
-}
-
-function switchSocTab(name){
-  const tabs = ["months","members","changes","collection","delivery"];
-  for(const t of tabs){
-    const panel = document.getElementById("socTab" + t.charAt(0).toUpperCase() + t.slice(1));
-    if(panel) panel.style.display = (t === name) ? "" : "none";
-
-    const btn = document.getElementById("tabBtn" + t.charAt(0).toUpperCase() + t.slice(1));
-    if(btn){
-      if(t === name) btn.classList.add("active");
-      else btn.classList.remove("active");
-    }
-  }
-}
-
-/* ====== بطاقات الشهور ====== */
-function statusClassFromRatio(ratio){
-  // ratio = مبلغ_التسليم / الموجود
-  if(!(ratio >= 0)) return "month-normal";
-  if(ratio > 1) return "month-over";
-  if(ratio === 1) return "month-limit";
-  if(ratio >= 0.75) return "month-near";
-  return "month-normal";
-}
-
-function buildMonthCards(data){
-  const grid = document.getElementById("monthsGridAdmin");
-  grid.innerHTML = "";
-
-  const keys = data.اشهر_مفاتيح || []; // yyyy-mm
-  const members = data.اعضاء || [];
-
-  // حاليا لا يوجد في API ملخص شهر (موجود/تسليم/فائض), فنعرض “طبيعي”
-  // لاحقا عند إضافة ملخصات سنلونها بدقة
-  for(let i=0;i<10;i++){
-    const idx = i;
-    const totalShares = members.reduce((sum,m)=> sum + Number((m.اشهر && m.اشهر[idx]) || 0), 0);
-    const deliveryAmount = totalShares * 1000;
-
-    const card = document.createElement("div");
-    card.className = "monthCard month-normal";
-    card.innerHTML = `
-      <div class="monthHead">
-        <div class="monthTitle">شهر ${idx+1}</div>
-        <div class="monthKey">${esc(keys[idx] || "")}</div>
-      </div>
-      <div class="monthStats">
-        <div>${pill("أسهم الشهر " + totalShares)}</div>
-        <div>${pill("قيمة التسليم " + deliveryAmount)}</div>
-      </div>
-      <div class="monthHint">اضغط لعرض التفاصيل</div>
-    `;
-
-    card.onclick = function(){
-      openMonth(idx);
-    };
-
-    grid.appendChild(card);
-  }
-}
-
-function openMonth(index){
-  const d = ADMIN.societyData;
-  if(!d) return;
-
-  const members = d.اعضاء || [];
-  const keys = d.اشهر_مفاتيح || [];
-  const monthNo = index + 1;
-
-  document.getElementById("monthTitle").textContent = "تفاصيل شهر " + monthNo;
-  document.getElementById("monthMeta").textContent = "المفتاح " + (keys[index] || "");
-
-  // عرض قائمة المستلمين لهذا الشهر (من توزيع الأسهم)
-  const rows = [];
-  for(const m of members){
-    const v = Number((m.اشهر && m.اشهر[index]) || 0);
-    if(v > 0){
-      const remain = Number(m.عدد_الاسهم || 0) - Number(m.اجمالي || 0); // متبقي غير دقيق هنا لأنه يعتمد على كل الأشهر, لكنه يبين إن كان التوزيع كامل
-      rows.push({
-        الاسم: m.الاسم || "",
-        اسهم_هذا_الشهر: v,
-        قيمة: v * 1000,
-        اجمالي_اختيار: Number(m.اجمالي || 0),
-        عدد_اسهمه: Number(m.عدد_الاسهم || 0),
-        متبقي_تقريبي: remain
-      });
-    }
-  }
-
-  if(!rows.length){
-    document.getElementById("monthBody").innerHTML = `<div class="warn warn-gray">لا يوجد تسليم في هذا الشهر</div>`;
-  }else{
-    const totalShares = rows.reduce((s,x)=> s + Number(x.اسهم_هذا_الشهر||0), 0);
-    const totalAmount = totalShares * 1000;
-
-    document.getElementById("monthBody").innerHTML = `
-      <div class="warn warn-gray">
-        إجمالي أسهم التسليم لهذا الشهر ${esc(totalShares)} , إجمالي مبلغ التسليم ${esc(totalAmount)}
-      </div>
-
-      <div class="tableWrap mt12">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>الاسم</th>
-              <th>أسهم هذا الشهر</th>
-              <th>قيمة التسليم</th>
-              <th>عدد أسهمه</th>
-              <th>إجمالي اختياراته</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${rows.map(r=>`
-              <tr>
-                <td data-label="الاسم"><b>${esc(r.الاسم)}</b></td>
-                <td data-label="أسهم هذا الشهر">${esc(r.اسهم_هذا_الشهر)}</td>
-                <td data-label="قيمة التسليم">${esc(r.قيمة)}</td>
-                <td data-label="عدد أسهمه">${esc(r.عدد_اسهمه)}</td>
-                <td data-label="إجمالي اختياراته">${esc(r.اجمالي_اختيار)}</td>
-              </tr>
-            `).join("")}
-          </tbody>
-        </table>
-      </div>
-    `;
-  }
-
-  document.getElementById("monthPanel").style.display = "";
-  document.getElementById("monthPanel").scrollIntoView({ behavior:"smooth", block:"start" });
-}
-
-function closeMonthPanel(){
-  document.getElementById("monthPanel").style.display = "none";
-  document.getElementById("monthBody").innerHTML = "";
-}
-
-/* ====== جدول الأعضاء ====== */
-function buildMembersTable(data){
-  const box = document.getElementById("socMembersTable");
-  const members = data.اعضاء || [];
-
-  if(!members.length){
-    box.innerHTML = `<div class="warn warn-gray">لا يوجد أعضاء في هذه الجمعية</div>`;
-    return;
-  }
-
-  const thMonths = [];
-  for(let i=1;i<=10;i++){
-    thMonths.push(`<th>شهر ${i}</th>`);
-  }
-
-  box.innerHTML = `
-    <div class="tableWrap">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>الاسم</th>
-            <th>عدد الأسهم</th>
-            ${thMonths.join("")}
-            <th>الإجمالي</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${members.map(m=>{
-            const months = (m.اشهر || []);
-            let tds = "";
-            for(let i=0;i<10;i++){
-              const v = Number(months[i] || 0);
-              tds += `<td data-label="شهر ${i+1}">${v ? "<b>"+esc(v)+"</b>" : "0"}</td>`;
-            }
-            return `
-              <tr>
-                <td data-label="الاسم"><b>${esc(m.الاسم || "")}</b></td>
-                <td data-label="عدد الأسهم">${esc(m.عدد_الاسهم || 0)}</td>
-                ${tds}
-                <td data-label="الإجمالي"><b>${esc(m.اجمالي || 0)}</b></td>
-              </tr>
-            `;
-          }).join("")}
-        </tbody>
-      </table>
-    </div>
-  `;
-}
-
-/* ====== جدول التغييرات ====== */
-function buildChangesTable(data){
-  const box = document.getElementById("socChangesTable");
-  const arr = data.تغييرات || [];
-
-  if(!arr.length){
-    box.innerHTML = `<div class="warn warn-gray">لا توجد تغييرات مسجلة (انسحاب أو تعديل أسهم)</div>`;
-    return;
-  }
-
-  box.innerHTML = `
-    <div class="tableWrap">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>الاسم</th>
-            <th>الحالة</th>
-            <th>تاريخ أول اشتراك</th>
-            <th>تاريخ آخر تعديل</th>
-            <th>أسهم بعد التعديل</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${arr.map(x=>`
-            <tr>
-              <td data-label="الاسم"><b>${esc(x.الاسم || "")}</b></td>
-              <td data-label="الحالة">${esc(x.الحالة || "")}</td>
-              <td data-label="تاريخ أول اشتراك">${esc(x.تاريخ_اول_اشتراك || "")}</td>
-              <td data-label="تاريخ آخر تعديل">${esc(x.تاريخ_اخر_تعديل || "")}</td>
-              <td data-label="أسهم بعد التعديل"><b>${esc(x.اسهم_بعد || "")}</b></td>
-            </tr>
-          `).join("")}
-        </tbody>
-      </table>
-    </div>
-  `;
-}
-
-/* ====== جدول المشتركين في لوحة المدير (PIN + نسخ) ====== */
 function renderMembers(arr){
   const box = document.getElementById("members");
+  if(!box) return;
 
   if(!arr.length){
     box.innerHTML = `<div class="warn warn-gray">لا يوجد مشتركين</div>`;
     return;
   }
 
+  const rows = arr.map(u=>{
+    const الاسم = esc(u.الاسم || "");
+    const الجوال = esc(u.رقم_الجوال || "");
+    const رمز = esc(u.رمز || "");
+    const حالة = esc(u.حالة || "");
+    return `
+      <tr>
+        <td data-label="الاسم"><b>${الاسم}</b></td>
+        <td data-label="رقم الجوال">${الجوال}</td>
+        <td data-label="PIN"><span class="pillSmall">${رمز}</span></td>
+        <td data-label="الحالة">${حالة}</td>
+      </tr>
+    `;
+  }).join("");
+
   box.innerHTML = `
     <div class="tableWrap">
       <table class="table">
         <thead>
           <tr>
             <th>الاسم</th>
-            <th>الجوال</th>
+            <th>رقم الجوال</th>
             <th>PIN</th>
-            <th>نسخ</th>
-            <th>تفاصيل</th>
+            <th>الحالة</th>
           </tr>
         </thead>
-        <tbody>
-          ${arr.map(u=>`
-            <tr>
-              <td data-label="الاسم"><b>${esc(u.الاسم || "")}</b></td>
-              <td data-label="الجوال">${esc(u.رقم_الجوال || "")}</td>
-              <td data-label="PIN"><b>${esc(u.رمز || "")}</b></td>
-              <td data-label="نسخ">
-                <button class="btn btn2" onclick="copyText('${esc(String(u.رمز||""))}')">نسخ</button>
-              </td>
-              <td data-label="تفاصيل">
-                <button class="btn btn2" onclick="memberDetailsSoon('${esc(String(u.معرف||""))}')">تفاصيل</button>
-              </td>
-            </tr>
-          `).join("")}
-        </tbody>
+        <tbody>${rows}</tbody>
       </table>
     </div>
+    <div class="note">ملاحظة, تعديل PIN والاكشنات ستكون في المرحلة التالية</div>
+  `;
+}
 
-    <div class="note">
-      زر تفاصيل المشترك جاهز, سنفعله لاحقا لتعديل الرغبات (تقديم فقط إذا الشهر يسمح) حسب اتفاقنا
+async function createSoc(){
+  showMsg("", "");
+  const name = (document.getElementById("socName").value || "").trim();
+  const start = (document.getElementById("socStart").value || "").trim();
+
+  if(!name){
+    showMsg("err", "اسم الجمعية مطلوب");
+    return;
+  }
+  if(!start){
+    showMsg("err", "تاريخ البداية مطلوب");
+    return;
+  }
+
+  try{
+    await get("انشاء جمعية", {
+      token: adminToken,
+      اسم_الجمعية: name,
+      تاريخ_البداية: start
+    });
+
+    showMsg("ok", "تم انشاء الجمعية بنجاح");
+    document.getElementById("socName").value = "";
+    document.getElementById("socStart").value = "";
+
+    await loadAdminData();
+
+  }catch(e){
+    showMsg("err", e.message || String(e));
+  }
+}
+
+function computeMonthsTotals(members, monthlyCollection){
+  // members: [{اشهر:[10 قيم]}]
+  const months = 10;
+  const totals = [];
+
+  let surplusPrev = 0;
+  for(let i=0;i<months;i++){
+    const monthShares = members.reduce((s,m)=> s + Number((m.اشهر && m.اشهر[i]) ? m.اشهر[i] : 0), 0);
+    const deliveryAmount = monthShares * 1000;
+    const available = monthlyCollection + surplusPrev;
+    const ratio = (available > 0) ? (deliveryAmount / available) : 0;
+    const surplusEnd = available - deliveryAmount;
+
+    totals.push({ monthShares, deliveryAmount, available, ratio, surplusEnd, surplusPrev });
+    surplusPrev = surplusEnd;
+  }
+  return totals;
+}
+
+function buildMembersTable(members){
+  if(!members.length){
+    return `<div class="warn warn-gray">لا يوجد أعضاء في هذه الجمعية</div>`;
+  }
+
+  const headerMonths = Array.from({length:10}).map((_,i)=> `<th>${i+1}</th>`).join("");
+
+  const rows = members.map(m=>{
+    const months = (m.اشهر || []).slice(0,10);
+    const monthTds = Array.from({length:10}).map((_,i)=>{
+      const v = Number(months[i] || 0);
+      return `<td data-label="${i+1}">${v ? `<b>${esc(fmtNum(v))}</b>` : "0"}</td>`;
+    }).join("");
+
+    return `
+      <tr>
+        <td data-label="الاسم"><b>${esc(m.الاسم || "")}</b></td>
+        <td data-label="عدد الاسهم">${esc(fmtNum(m.عدد_الاسهم || 0))}</td>
+        ${monthTds}
+        <td data-label="الاجمالي"><b>${esc(fmtNum(m.اجمالي || 0))}</b></td>
+      </tr>
+    `;
+  }).join("");
+
+  return `
+    <div class="tableWrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>الاسم</th>
+            <th>عدد الاسهم</th>
+            ${headerMonths}
+            <th>الاجمالي</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
     </div>
   `;
 }
 
-function memberDetailsSoon(uid){
-  msg("err","تفاصيل المشترك سيتم تفعيلها في مرحلة الأكشنات");
+function buildChangesTable(changes){
+  if(!changes.length){
+    return `<div class="warn warn-gray">لا توجد تغييرات</div>`;
+  }
+
+  const rows = changes.map(x=>{
+    return `
+      <tr>
+        <td data-label="الاسم"><b>${esc(x.الاسم || "")}</b></td>
+        <td data-label="الحالة">${esc(x.الحالة || "")}</td>
+        <td data-label="تاريخ اول اشتراك">${esc(x.تاريخ_اول_اشتراك || "")}</td>
+        <td data-label="تاريخ اخر تعديل">${esc(x.تاريخ_اخر_تعديل || "")}</td>
+        <td data-label="اسهم بعد"><b>${esc(fmtNum(x.اسهم_بعد || 0))}</b></td>
+      </tr>
+    `;
+  }).join("");
+
+  return `
+    <div class="tableWrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>الاسم</th>
+            <th>الحالة</th>
+            <th>تاريخ اول اشتراك</th>
+            <th>تاريخ اخر تعديل</th>
+            <th>اسهم بعد</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `;
 }
 
-async function copyText(text){
+function buildMonthsCards(members, monthlyCollection, monthsTotals){
+  const months = 10;
+
+  const cards = [];
+  for(let i=0;i<months;i++){
+    const row = monthsTotals[i];
+    const status = calcMonthStatus(i, monthlyCollection, monthsTotals);
+
+    const monthNo = i + 1;
+    const totalShares = row ? row.monthShares : 0;
+    const deliveryAmount = row ? row.deliveryAmount : 0;
+    const available = row ? row.available : 0;
+
+    const card = document.createElement("div");
+    card.className = `month-card ${status}`;
+    card.innerHTML = `
+      <div class="stripe"></div>
+      <h4>شهر ${monthNo}</h4>
+      <div class="meta">
+        <div>إجمالي اسهم التسليم ${esc(fmtNum(totalShares))}</div>
+        <div>مبلغ التسليم ${esc(Math.round(deliveryAmount))}</div>
+        <div>الموجود ${esc(Math.round(available))}</div>
+      </div>
+    `;
+
+    card.onclick = function(){
+      const existing = card.querySelector(".accordion");
+      if(existing){
+        existing.remove();
+        return;
+      }
+
+      const acc = document.createElement("div");
+      acc.className = "accordion";
+
+      // تفاصيل المشتركين لهذا الشهر فقط
+      members.forEach(m=>{
+        const v = Number((m.اشهر && m.اشهر[i]) ? m.اشهر[i] : 0);
+        if(v <= 0) return;
+
+        const total = Number(m.عدد_الاسهم || 0);
+        const usedTill = sumArr((m.اشهر || []).slice(0, i+1));
+        const remaining = total - usedTill;
+
+        acc.innerHTML += `
+          <div class="accRow">
+            <span><b>${esc(m.الاسم || "")}</b></span>
+            <span>${esc(fmtNum(v))} سهم</span>
+            <span class="pillSmall">المتبقي ${esc(fmtNum(remaining))}</span>
+          </div>
+        `;
+      });
+
+      if(!acc.innerHTML.trim()){
+        acc.innerHTML = `<div class="warn warn-gray">لا يوجد تسليم في هذا الشهر</div>`;
+      }
+
+      card.appendChild(acc);
+    };
+
+    cards.push(card);
+  }
+
+  return cards;
+}
+
+async function openSociety(id){
+  showMsg("", "");
+  currentSocietyId = id;
+
   try{
-    await navigator.clipboard.writeText(String(text || ""));
-    msg("ok","تم النسخ");
-    setTimeout(()=> msg("", ""), 600);
+    const data = await get("لوحة جمعية للمدير", { token: adminToken, معرف_الجمعية: id });
+
+    const soc = data.جمعية || {};
+    const members = data.اعضاء || [];
+    const changes = data.تغييرات || [];
+
+    // عنوان وميتا
+    const title = `${soc.اسم || "جمعية"}  ${badgeHtml(soc.حالة)}`;
+    document.getElementById("societyTitle").innerHTML = title;
+
+    const monthlyCollection = Number(soc.عدد_الاسهم || 0) * 100;
+
+    document.getElementById("societyMeta").innerHTML = `
+      <div class="grid">
+        <div class="col-6"><span class="labelPill">تاريخ البداية</span> <div class="mt8"><b>${esc(soc.تاريخ_البداية || "")}</b></div></div>
+        <div class="col-6"><span class="labelPill">تاريخ النهاية</span> <div class="mt8"><b>${esc(soc.تاريخ_النهاية || "")}</b></div></div>
+        <div class="col-6"><span class="labelPill">عدد المشتركين</span> <div class="mt8"><b>${esc(soc.عدد_المشتركين || 0)}</b></div></div>
+        <div class="col-6"><span class="labelPill">عدد الاسهم</span> <div class="mt8"><b>${esc(fmtNum(soc.عدد_الاسهم || 0))}</b></div></div>
+        <div class="col-12"><span class="labelPill">التحصيل الشهري</span> <div class="mt8"><b>${esc(Math.round(monthlyCollection))}</b></div></div>
+      </div>
+    `;
+
+    // بناء البطاقات
+    const monthsTotals = computeMonthsTotals(members, monthlyCollection);
+    const monthsGrid = document.getElementById("monthsGrid");
+    monthsGrid.innerHTML = "";
+    const cards = buildMonthsCards(members, monthlyCollection, monthsTotals);
+    cards.forEach(c=> monthsGrid.appendChild(c));
+
+    // الجداول
+    document.getElementById("societyMembersTable").innerHTML = buildMembersTable(members);
+    document.getElementById("societyChangesTable").innerHTML = buildChangesTable(changes);
+
+    // اظهار قسم الجمعية
+    hide(document.getElementById("dashboard"));
+    show(document.getElementById("societyView"));
+
+    // افتراضي على بطاقات الأشهر
+    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+    const firstTab = document.querySelector(".tab");
+    if(firstTab) firstTab.classList.add("active");
+    switchTab("months", null);
+
   }catch(e){
-    msg("err","تعذر النسخ, انسخ يدويا");
+    showMsg("err", e.message || String(e));
   }
 }
+
+(function(){
+  bootstrap();
+})();
