@@ -82,7 +82,7 @@ function formatSocDetails(s){
       <div class="mt12 align-end">
         <a class="btn" href="society.html?معرف=${encodeURIComponent(s.معرف)}">فتح صفحة الجمعية</a>
       </div>
-      <div class="note">تغيير الحالة والحذف وتعديل PIN سنضيفه في المرحلة التالية بعد تأكيد Actions في سكربت قوقل.</div>
+      <div class="note">تفاصيل الاعضاء وسجل التعديلات سنفعله في المرحلة الثانية بعد تزويدي بسكربت قوقل والجداول.</div>
     </div>
   `;
 }
@@ -91,7 +91,6 @@ async function loadSocieties(){
   const data = await get("قائمة الجمعيات", {});
   const arr = data.جمعيات || [];
 
-  // بطاقات: الجديدة + النشطة فقط, اخر 3 (حسب طلبك)
   const cards = arr
     .filter(x=> (x.حالة==="جديدة" || x.حالة==="نشطة"))
     .slice(-3)
@@ -103,7 +102,6 @@ async function loadSocieties(){
     setHtml("socCards", `<div style="display:flex;gap:12px;flex-wrap:wrap">${cards.map(formatSocCard).join("")}</div>`);
   }
 
-  // القائمة المنسدلة: كل الجمعيات
   const sel = document.getElementById("socSelect");
   sel.innerHTML = "";
   const opt0 = document.createElement("option");
@@ -162,7 +160,6 @@ async function loadMembers(){
         </tbody>
       </table>
     </div>
-    <div class="note">تعديل PIN من لوحة المدير سنضيفه في المرحلة التالية بعد تأكيد Action في سكربت قوقل.</div>
   `);
 }
 
@@ -194,7 +191,7 @@ async function createSoc(){
   try{
     const s = جلسة();
     const اسم_الجمعية = document.getElementById("socName").value.trim();
-    const تاريخ_البداية = document.getElementById("socStart").value.trim();
+    const تاريخ_البداية = document.getElementById("socStart").value; // من type="date" جاهز yyyy-mm-dd
 
     if(!اسم_الجمعية) throw new Error("اسم الجمعية مطلوب");
     if(!تاريخ_البداية) throw new Error("تاريخ البداية مطلوب");
@@ -205,7 +202,6 @@ async function createSoc(){
     document.getElementById("socName").value = "";
     document.getElementById("socStart").value = "";
 
-    // تحديث عرض الجمعيات مباشرة
     showTab("soc");
     await loadSocieties();
 
