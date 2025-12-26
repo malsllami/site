@@ -33,26 +33,14 @@ function monthLabelHijriFromYYYYMM(yyyyMM){
   const m = Number(parts[1]);
   if(!(y > 0 && m >= 1 && m <= 12)) return "";
 
-  // اول يوم من الشهر الميلادي
   const d = new Date(y, m - 1, 1);
 
   try{
-    // تقويم هجري, ar-SA-u-ca-islamic
     const fmt = new Intl.DateTimeFormat("ar-SA-u-ca-islamic", {
-      day: "numeric",
       month: "long",
       year: "numeric"
     });
-
-    // نعرض "شهر سنة" فقط بدون اليوم
-    const full = fmt.format(d); // مثال: ١ رمضان ١٤٤٧ هـ
-    // حذف اليوم ان وجد, نأخذ اخر جزئين تقريبا, لكن بصيغة آمنة:
-    // نعيد تنسيق الشهر والسنة مباشرة:
-    const fmt2 = new Intl.DateTimeFormat("ar-SA-u-ca-islamic", {
-      month: "long",
-      year: "numeric"
-    });
-    return fmt2.format(d);
+    return fmt.format(d);
   }catch(e){
     return "";
   }
@@ -176,7 +164,6 @@ function renderPrefSummary(months, prefObj, eventMap){
   const isMember = isLogged && s.role === "مشترك";
   const isAdmin = isLogged && s.role === "مدير";
 
-  // القوائم حسب الجلسة
   if(isLogged){
     document.getElementById("logout").style.display = "";
   }
@@ -199,13 +186,11 @@ function renderPrefSummary(months, prefObj, eventMap){
     const soc = details.جمعية;
     setHtml("socInfo", renderSocInfo(soc));
 
-    // زائر
     if(!isLogged){
       setHtml("joinBox", renderJoinBoxForVisitor());
       return;
     }
 
-    // مدير عرض فقط
     if(isAdmin){
       document.getElementById("joinCard").style.display = "none";
       document.getElementById("btnPrefs").style.display = "none";
@@ -213,11 +198,9 @@ function renderPrefSummary(months, prefObj, eventMap){
       return;
     }
 
-    // مشترك
     const memberInfo = await get("تفاصيل جمعية للمشترك", { token: s.token, معرف_الجمعية: sid });
     const isSubscribed = !!memberInfo.مشترك_مسجل;
 
-    // زر ادارة الرغبات يظهر فقط للمشترك داخل جمعية جديدة
     if(isSubscribed && String(soc.حالة) === "جديدة"){
       document.getElementById("btnPrefs").style.display = "";
       document.getElementById("btnPrefs").onclick = function(){
@@ -227,7 +210,6 @@ function renderPrefSummary(months, prefObj, eventMap){
       document.getElementById("btnPrefs").style.display = "none";
     }
 
-    // صندوق الاشتراك
     if(isSubscribed){
       setHtml("joinBox", renderJoinBoxSubscribed());
     }else{
@@ -244,7 +226,6 @@ function renderPrefSummary(months, prefObj, eventMap){
       };
     }
 
-    // ملخص الرغبات للمشترك المشترك فقط
     if(isSubscribed){
       try{
         const prefState = await get("رغبات حالة", { token: s.token, معرف_الجمعية: sid });
@@ -260,11 +241,9 @@ function renderPrefSummary(months, prefObj, eventMap){
           setHtml("prefSummary", `<div class="warn warn-gray">لم يتم اختيار رغبات بعد</div>`);
         }
 
-        // اذا ليست جديدة نخفي زر الادارة ونكتفي بالعرض
         if(String(soc.حالة) !== "جديدة"){
           document.getElementById("btnPrefs").style.display = "none";
         }
-
       }catch(e){
         document.getElementById("prefCard").style.display = "none";
       }
