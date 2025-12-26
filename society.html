@@ -28,27 +28,13 @@
     <div class="card">
       <h3>صفحة الجمعية</h3>
       <div id="socInfo"></div>
+      <div style="margin-top:12px" id="actions"></div>
     </div>
 
-    <div class="card" id="joinBox" style="display:none">
-      <h3 id="joinTitle">التسجيل في الجمعية الجديدة</h3>
-
-      <div class="grid">
-        <div class="col-6">
-          <input class="input" id="shares" placeholder="عدد الاسهم مثل 1 او 0.5">
-        </div>
-
-        <div class="col-6" style="display:flex;gap:10px;justify-content:flex-start;flex-wrap:wrap">
-          <button class="btn" id="btnSave" onclick="saveShares()">حفظ وارسال</button>
-          <button class="btn btn2" id="btnWithdraw" onclick="withdrawSoc()" style="display:none">انسحاب</button>
-        </div>
-
-        <div class="col-12" style="color:#666">
-          ملاحظة, يسمح بنصف سهم كحد ادنى
-        </div>
-      </div>
+    <div class="card">
+      <h3>التسجيل في الجمعية الجديدة</h3>
+      <div id="joinBox"></div>
     </div>
-
   </div>
 
   <script src="assets/js/config.js"></script>
