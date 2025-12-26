@@ -16,15 +16,9 @@ function normalizeMonthKey(s){
   const v = String(s || "").trim();
   if(!v) return "";
 
-  // يقبل 2026-01
   const m1 = v.match(/^(\d{4})-(\d{2})$/);
   if(m1) return m1[1] + "-" + m1[2];
 
-  // يقبل 01-2026 ويحولها الى 2026-01
-  const m2 = v.match(/^(\d{2})-(\d{4})$/);
-  if(m2) return m2[2] + "-" + m2[1];
-
-  // يقبل 2026-1 ويحولها 2026-01
   const m3 = v.match(/^(\d{4})-(\d{1})$/);
   if(m3) return m3[1] + "-0" + m3[2];
 
@@ -69,51 +63,37 @@ function monthLabelHijriFromYYYYMM(yyyyMM){
   }
 }
 
-function buildEventMapFromSummary(summary){
-  const map = {};
-  const arr = summary || [];
-  for(const s of arr){
-    const rawKey = String(s.شهر || "").trim();
-    const key = normalizeMonthKey(rawKey);
-    const ev = String(s.مناسبة || "").trim();
-    if(key) map[key] = ev;
-  }
-  return map;
-}
-
-function buildTable(months, eventMap){
+function buildTable(months){
   let html = `
     <div class="tableWrap">
       <table class="table">
-        <tr>
-          <th>الشهر</th>
-          <th>الشهر الهجري</th>
-          <th>المناسبة</th>
-          <th>عدد الاسهم</th>
-          <th>النوع</th>
-        </tr>
+        <thead>
+          <tr>
+            <th>الشهر</th>
+            <th>الشهر الهجري</th>
+            <th>عدد الاسهم</th>
+            <th>النوع</th>
+          </tr>
+        </thead>
+        <tbody>
   `;
 
   for(let i=0;i<months.length;i++){
-    const raw = String(months[i] || "");
-    const key = normalizeMonthKey(raw);
-
+    const key = normalizeMonthKey(months[i] || "");
     const ميلادي = monthLabelGregorian(key);
     const هجري = monthLabelHijriFromYYYYMM(key);
-    const مناسبة = String((eventMap && eventMap[key]) || "").trim();
 
     html += `
       <tr>
-        <td>
+        <td data-label="الشهر">
           <div class="cellTitle">${esc(ميلادي)}</div>
           <div class="cellSub">${esc(key)}</div>
         </td>
-        <td>${esc(هجري || "-")}</td>
-        <td>${esc(مناسبة || "-")}</td>
-        <td>
+        <td data-label="الشهر الهجري">${esc(هجري || "-")}</td>
+        <td data-label="عدد الاسهم">
           <input class="input" inputmode="decimal" id="m${i+1}" value="0" placeholder="0 او 0.5 او 1">
         </td>
-        <td>
+        <td data-label="النوع">
           <select class="input" id="t${i+1}">
             <option value="قابل للتعديل">قابل للتعديل</option>
             <option value="ضروري">ضروري</option>
@@ -124,6 +104,7 @@ function buildTable(months, eventMap){
   }
 
   html += `
+        </tbody>
       </table>
     </div>
   `;
@@ -149,51 +130,14 @@ function calcSum(monthCount){
   return Math.round(sum * 2) / 2;
 }
 
-function setStatusMessage(sum, shares){
-  let text = "";
-  let cls = "warn-gray";
-
+function renderSumMessage(sum, shares){
   if(sum < shares){
-    text = "مجموع الاسهم المدخلة اقل من اسهمك";
-    cls = "warn-orange";
-  }else if(sum > shares){
-    text = "مجموع الاسهم المدخلة اكثر من اسهمك";
-    cls = "warn-red";
-  }else{
-    text = "توزيعك متوازن , مجموعك الحالي " + sum + " من " + shares;
-    cls = "warn-green";
+    return `<div class="warn warn-orange">مجموع الاسهم المدخلة اقل من اسهمك , مجموعك الحالي ${esc(sum)} من ${esc(shares)}</div>`;
   }
-
-  setHtml("msg", `<div class="warn ${cls}">${esc(text)}</div>`);
-}
-
-function renderWarnings(summary, months){
-  const arr = summary || [];
-  const rows = [];
-
-  for(let i=0;i<arr.length;i++){
-    const s = arr[i];
-    const key = normalizeMonthKey(months[i] || "");
-    const label = monthLabelGregorian(key);
-
-    const نسبة = Number(s.نسبة || 0);
-    const حالة = String(s.حالة || "");
-    const مناسبة = String(s.مناسبة || "").trim();
-
-    if(حالة === "تجاوز"){
-      rows.push(`<div class="warn warn-red">تم تجاوز القدرة المتاحة للتسليم في شهر ${esc(label)}</div>`);
-    }else if(حالة === "حد"){
-      rows.push(`<div class="warn warn-orange">هذا الشهر قريب من الحد الاقصى للتسليم ${esc(label)}</div>`);
-    }else if(نسبة >= 0.75){
-      rows.push(`<div class="warn warn-orange">هذا الشهر عليه ضغط عالي ${esc(label)}</div>`);
-    }
-
-    if(مناسبة){
-      rows.push(`<div class="warn warn-gray">هذا الشهر موسم مصاريف ${esc(مناسبة)}</div>`);
-    }
+  if(sum > shares){
+    return `<div class="warn warn-red">مجموع الاسهم المدخلة اكثر من اسهمك , مجموعك الحالي ${esc(sum)} من ${esc(shares)}</div>`;
   }
-
-  return rows.length ? rows.join("") : `<div class="warn warn-gray">لا توجد تحذيرات</div>`;
+  return `<div class="warn warn-green">عدد الاسهم المختارة يساوي عدد اسهمك , مجموعك الحالي ${esc(sum)} من ${esc(shares)}</div>`;
 }
 
 (async function(){
@@ -224,7 +168,8 @@ function renderWarnings(summary, months){
     setHtml("socInfo",
       "اسم الجمعية <b>" + esc(soc.اسم) + "</b><br>" +
       "تاريخ البداية <b>" + esc(soc.تاريخ_البداية) + "</b><br>" +
-      "تاريخ النهاية <b>" + esc(soc.تاريخ_النهاية) + "</b>"
+      "تاريخ النهاية <b>" + esc(soc.تاريخ_النهاية) + "</b><br>" +
+      "عدد اسهمك <b>" + esc(shares) + "</b>"
     );
 
     if(String(soc.حالة) !== "جديدة"){
@@ -235,24 +180,22 @@ function renderWarnings(summary, months){
       return;
     }
 
-    const eventMap = buildEventMapFromSummary(data.ملخص || []);
-
-    setHtml("prefBox", buildTable(months, eventMap));
+    setHtml("prefBox", buildTable(months));
     fillExisting(data.رغبات || null, months.length);
-
-    setHtml("warnings", renderWarnings(data.ملخص || [], months));
 
     function refresh(){
       const sum = calcSum(months.length);
-      setStatusMessage(sum, shares);
+      setHtml("msg", renderSumMessage(sum, shares));
     }
 
     for(let i=1;i<=months.length;i++){
       document.getElementById("m"+i).addEventListener("input", refresh);
       document.getElementById("t"+i).addEventListener("change", refresh);
     }
-
     refresh();
+
+    // نلغي تحذيرات المناسبات تماما, ونكتفي برسالة المجموع فقط
+    setHtml("warnings", "");
 
     document.getElementById("btnSave").onclick = async function(){
       try{
