@@ -7,17 +7,20 @@
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
+
   <div class="top">
     <div class="row">
-      <div>
-        <a href="index.html" id="navHome">الشاشة الرئيسية</a>
+      <div class="nav">
+        <a href="index.html">الشاشة الرئيسية</a>
+        <a href="member.html" id="navMember" style="display:none">شاشة المشتركين</a>
+        <a href="admin.html" id="navAdmin" style="display:none">شاشة المدير</a>
         <a href="register.html" id="navRegister">شاشة التسجيل</a>
       </div>
-      <div style="font-weight:900">جمعية عائلية</div>
-      <div>
-        <a href="member.html" id="navMember">شاشة المشتركين</a>
-        <a href="admin.html" id="navAdmin">شاشة المدير</a>
-        <a href="#" id="navLogout" style="display:none">خروج</a>
+
+      <div class="brand">جمعية عائلية</div>
+
+      <div class="nav">
+        <a href="#" id="logout" style="display:none">خروج</a>
       </div>
     </div>
   </div>
@@ -27,48 +30,69 @@
 
     <div class="card" id="loginBox">
       <h3>دخول المدير</h3>
-      <div class="grid">
-        <div class="col-6">
-          <input class="input" id="adminPin" placeholder="رمز PIN للمدير">
-        </div>
-        <div class="col-6">
-          <button class="btn" onclick="adminLogin()">دخول</button>
-        </div>
+      <input class="input" id="adminPin" placeholder="رمز PIN للمدير">
+      <div class="mt12 align-end">
+        <button class="btn" id="btnAdminLogin">دخول</button>
       </div>
+      <div class="note">هذه الصفحة مخصصة للمدير فقط</div>
     </div>
 
     <div id="adminPanel" style="display:none">
       <div class="card">
-        <h3>انشاء جمعية جديدة</h3>
-        <div class="grid">
-          <div class="col-6">
-            <input class="input" id="socName" placeholder="اسم الجمعية">
-          </div>
-          <div class="col-6">
-            <input class="input" id="socStart" placeholder="تاريخ البداية مثل 2026-01-01">
-          </div>
-          <div class="col-12">
-            <button class="btn" id="btnCreate" onclick="createSoc()">انشاء</button>
-          </div>
+        <h3>لوحة المدير</h3>
+        <div class="note">اختر قسم للتنقل</div>
+
+        <div class="mt12" style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-start">
+          <button class="btn" id="tabSocBtn">الجمعيات</button>
+          <button class="btn" id="tabMemBtn">المشتركين</button>
+          <button class="btn" id="tabNewBtn">انشاء جمعية</button>
         </div>
       </div>
 
-      <div class="card">
+      <div class="card" id="tabSoc">
         <h3>الجمعيات</h3>
-        <div class="grid" id="societiesAdmin"></div>
+
+        <div class="note">يعرض بطاقات للجمعيات الجديدة والنشطة فقط, وباقي الجمعيات في قائمة منسدلة</div>
+
+        <div id="socCards" class="mt12"></div>
+
+        <div class="mt12">
+          <label class="small">كل الجمعيات</label>
+          <select class="input" id="socSelect"></select>
+        </div>
+
+        <div id="socDetails" class="mt12"></div>
       </div>
 
-      <div class="card">
+      <div class="card" id="tabMem" style="display:none">
         <h3>المشتركين</h3>
         <div id="members"></div>
       </div>
+
+      <div class="card" id="tabNew" style="display:none">
+        <h3>انشاء جمعية جديدة</h3>
+        <div class="note">سيتم منع تكرار اسم الجمعية, وتم منع تكرار نفس تاريخ البداية</div>
+
+        <div class="mt12" style="display:flex;gap:10px;flex-wrap:wrap">
+          <div style="flex:1;min-width:220px">
+            <input class="input" id="socName" placeholder="اسم الجمعية">
+          </div>
+          <div style="flex:1;min-width:220px">
+            <input class="input" id="socStart" placeholder="تاريخ البداية مثل 2026-01-01">
+          </div>
+        </div>
+
+        <div class="mt12 align-end">
+          <button class="btn" id="btnCreateSoc">انشاء</button>
+        </div>
+      </div>
+
     </div>
   </div>
 
   <script src="assets/js/config.js"></script>
   <script src="assets/js/api.js"></script>
   <script src="assets/js/ui.js"></script>
-  <script src="assets/js/auth_ui.js"></script>
   <script src="assets/js/pages/admin.js"></script>
 </body>
 </html>
