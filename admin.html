@@ -1,22 +1,23 @@
+<!-- admin.html  , انسخه واستبدله بالكامل -->
 <!doctype html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>شاشة المدير</title>
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
-<body>
+<body class="admin-theme">
   <div class="top">
     <div class="row">
-      <div>
+      <div class="nav">
         <a href="index.html" id="navHome">الشاشة الرئيسية</a>
         <a href="register.html" id="navRegister">شاشة التسجيل</a>
       </div>
 
       <div class="brand">جمعية عائلية</div>
 
-      <div>
+      <div class="nav">
         <a href="member.html" id="navMember">شاشة المشتركين</a>
         <a href="admin.html" id="navAdmin">شاشة المدير</a>
         <a href="#" id="navLogout" style="display:none">خروج</a>
@@ -31,132 +32,115 @@
     <div class="card" id="loginBox">
       <h3>دخول المدير</h3>
       <div class="grid">
-        <div class="col-6">
-          <input class="input" id="adminPin" placeholder="رمز PIN للمدير" inputmode="numeric">
-          <div class="note">الدخول للمدير فقط</div>
+        <div class="col-8">
+          <div class="field">
+            <div class="labelPill">رمز PIN للمدير</div>
+            <input class="input" id="adminPin" placeholder="ادخل رمز PIN">
+          </div>
         </div>
-        <div class="col-6">
-          <button class="btn" onclick="adminLogin()">دخول</button>
+        <div class="col-4">
+          <button class="btn w100" id="btnAdminLogin" onclick="adminLogin()">دخول</button>
         </div>
       </div>
+      <div class="note">ملاحظة, دخول المدير يكون برمز PIN فقط</div>
     </div>
 
     <!-- لوحة المدير -->
     <div id="adminPanel" style="display:none">
 
-      <!-- إنشاء جمعية جديدة -->
-      <div class="card">
-        <h3>انشاء جمعية جديدة</h3>
-        <div class="grid">
-          <div class="col-6">
-            <div class="pillLabel">اسم الجمعية</div>
-            <input class="input" id="socName" placeholder="مثال جمعية 1">
+      <!-- لوحة رئيسية -->
+      <div id="dashboard">
+
+        <div class="card">
+          <div class="cardHead">
+            <h3>انشاء جمعية جديدة</h3>
+            <div class="muted">صيغة التاريخ ثابتة عبر اختيار التقويم</div>
           </div>
 
-          <div class="col-6">
-            <div class="pillLabel">تاريخ البداية</div>
-            <!-- المطلوب: تقويم -->
-            <input class="input" id="socStart" type="date">
-          </div>
-
-          <div class="col-12 align-end mt12">
-            <button class="btn" id="btnCreate" onclick="createSoc()">انشاء</button>
-          </div>
-        </div>
-
-        <div class="note">
-          يمنع تكرار اسم الجمعية, ويمنع تكرار تاريخ البداية او نفس المدة
-        </div>
-      </div>
-
-      <!-- الجمعيات -->
-      <div class="card">
-        <div class="cardHead">
-          <h3 style="margin:0">الجمعيات</h3>
-          <div class="small muted" id="socCount"></div>
-        </div>
-        <div class="grid" id="societiesAdmin"></div>
-      </div>
-
-      <!-- تفاصيل الجمعية: تظهر عند اختيار جمعية -->
-      <div class="card" id="societyDetailsCard" style="display:none">
-        <div class="cardHead">
-          <div>
-            <h3 style="margin:0" id="socTitle">تفاصيل الجمعية</h3>
-            <div class="small muted" id="socMeta"></div>
-          </div>
-          <div class="align-end">
-            <button class="btn btn2" onclick="closeSocietyDetails()">إغلاق</button>
-          </div>
-        </div>
-
-        <!-- تبويبات داخل الجمعية -->
-        <div class="tabs mt12">
-          <button class="tabBtn active" id="tabBtnMonths" onclick="switchSocTab('months')">الأشهر</button>
-          <button class="tabBtn" id="tabBtnMembers" onclick="switchSocTab('members')">الأعضاء</button>
-          <button class="tabBtn" id="tabBtnChanges" onclick="switchSocTab('changes')">التغييرات</button>
-          <button class="tabBtn" id="tabBtnCollection" onclick="switchSocTab('collection')">التحصيل</button>
-          <button class="tabBtn" id="tabBtnDelivery" onclick="switchSocTab('delivery')">التسليم</button>
-        </div>
-
-        <!-- الأشهر -->
-        <div id="socTabMonths" class="mt12">
-          <div class="note">
-            بطاقات 10 شهور, اضغط على أي شهر لعرض تفاصيل الشهر
-          </div>
-          <div class="monthsGrid" id="monthsGridAdmin"></div>
-
-          <div class="monthPanel" id="monthPanel" style="display:none">
-            <div class="divider"></div>
-            <div class="cardHead">
-              <div>
-                <div class="pillLabel" id="monthTitle">تفاصيل الشهر</div>
-                <div class="small muted" id="monthMeta"></div>
-              </div>
-              <div class="align-end">
-                <button class="btn btn2" onclick="closeMonthPanel()">إغلاق</button>
+          <div class="grid">
+            <div class="col-6">
+              <div class="field">
+                <div class="labelPill">اسم الجمعية</div>
+                <input class="input" id="socName" placeholder="مثال , جمعية 1">
               </div>
             </div>
-
-            <div id="monthBody" class="mt12"></div>
+            <div class="col-6">
+              <div class="field">
+                <div class="labelPill">تاريخ البداية</div>
+                <input class="input" id="socStart" type="date">
+              </div>
+            </div>
+            <div class="col-12 align-end">
+              <button class="btn" id="btnCreate" onclick="createSoc()">انشاء</button>
+            </div>
           </div>
         </div>
 
-        <!-- الأعضاء -->
-        <div id="socTabMembers" class="mt12" style="display:none">
-          <div class="note">
-            جدول الأعضاء يوضح توزيع الأسهم على الأشهر من 1 الى 10
+        <div class="card">
+          <div class="cardHead">
+            <h3>الجمعيات</h3>
+            <div class="muted">اضغط فتح لعرض تفاصيل الجمعية داخل لوحة المدير</div>
           </div>
-          <div id="socMembersTable"></div>
+          <div class="grid" id="societiesAdmin"></div>
         </div>
 
-        <!-- التغييرات -->
-        <div id="socTabChanges" class="mt12" style="display:none">
-          <div class="note">
-            يظهر المنسحبين أو من قام بتعديل الأسهم, مع تاريخ أول اشتراك وآخر تعديل
+        <div class="card">
+          <div class="cardHead">
+            <h3>المشتركين</h3>
+            <div class="muted">عرض فقط في هذه المرحلة</div>
           </div>
-          <div id="socChangesTable"></div>
+          <div id="members"></div>
         </div>
 
-        <!-- التحصيل: هيكل فقط الآن -->
-        <div id="socTabCollection" class="mt12" style="display:none">
-          <div class="warn warn-gray">
-            قسم التحصيل جاهز للمرحلة القادمة, سيتم بناء بطاقات كل شهر مع تشيك بوكس ومجموع يطابق إجمالي التحصيل 100٪
-          </div>
-        </div>
-
-        <!-- التسليم: هيكل فقط الآن -->
-        <div id="socTabDelivery" class="mt12" style="display:none">
-          <div class="warn warn-gray">
-            قسم التسليم جاهز للمرحلة القادمة, ممنوع التسليم الجزئي, تشيك بوكس للمستحقين لهذا الشهر فقط, ومجموع يطابق إجمالي التسليم 100٪
-          </div>
-        </div>
       </div>
 
-      <!-- المشتركين -->
-      <div class="card">
-        <h3>المشتركين</h3>
-        <div id="members"></div>
+      <!-- عرض جمعية محددة داخل نفس الصفحة -->
+      <div id="societyView" style="display:none">
+
+        <div class="card">
+          <div class="cardHead">
+            <h3 id="societyTitle">تفاصيل الجمعية</h3>
+            <div class="align-end">
+              <button class="btn btn2" onclick="backToDashboard()">رجوع</button>
+            </div>
+          </div>
+
+          <div id="societyMeta" class="small"></div>
+
+          <div class="tabs mt12">
+            <button class="tab active" onclick="switchTab('months', event)">بطاقات الأشهر</button>
+            <button class="tab" onclick="switchTab('members', event)">جدول الأعضاء</button>
+            <button class="tab" onclick="switchTab('changes', event)">التغييرات</button>
+          </div>
+        </div>
+
+        <!-- تبويب بطاقات الأشهر -->
+        <div class="card" id="tab-months">
+          <div class="cardHead">
+            <h3>بطاقات الأشهر</h3>
+            <div class="muted">الألوان تعكس حالة الشهر حسب القدرة المتاحة للتسليم</div>
+          </div>
+          <div id="monthsGrid" class="monthsGrid"></div>
+        </div>
+
+        <!-- تبويب جدول الأعضاء -->
+        <div class="card" id="tab-members" style="display:none">
+          <div class="cardHead">
+            <h3>الأعضاء وتوزيع الأسهم 1 الى 10</h3>
+            <div class="muted">عرض فقط</div>
+          </div>
+          <div id="societyMembersTable"></div>
+        </div>
+
+        <!-- تبويب التغييرات -->
+        <div class="card" id="tab-changes" style="display:none">
+          <div class="cardHead">
+            <h3>التغييرات</h3>
+            <div class="muted">انسحاب أو تعديل أسهم أثناء الجمعية الجديدة</div>
+          </div>
+          <div id="societyChangesTable"></div>
+        </div>
+
       </div>
 
     </div>
