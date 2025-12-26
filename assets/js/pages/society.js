@@ -7,10 +7,23 @@ function toNum(x){
   return isFinite(n) ? n : 0;
 }
 
+function normalizeMonthKey(s){
+  const v = String(s || "").trim();
+  if(!v) return "";
+
+  const m1 = v.match(/^(\d{4})-(\d{2})$/);
+  if(m1) return m1[1] + "-" + m1[2];
+
+  const m3 = v.match(/^(\d{4})-(\d{1})$/);
+  if(m3) return m3[1] + "-0" + m3[2];
+
+  return v;
+}
+
 function monthLabelGregorian(yyyyMM){
-  const s = String(yyyyMM || "").trim();
-  const parts = s.split("-");
-  if(parts.length !== 2) return s;
+  const key = normalizeMonthKey(yyyyMM);
+  const parts = key.split("-");
+  if(parts.length !== 2) return key;
 
   const y = parts[0];
   const m = Number(parts[1]);
@@ -21,12 +34,12 @@ function monthLabelGregorian(yyyyMM){
   ];
 
   if(m >= 1 && m <= 12) return شهور[m-1] + " " + y;
-  return s;
+  return key;
 }
 
 function monthLabelHijriFromYYYYMM(yyyyMM){
-  const s = String(yyyyMM || "").trim();
-  const parts = s.split("-");
+  const key = normalizeMonthKey(yyyyMM);
+  const parts = key.split("-");
   if(parts.length !== 2) return "";
 
   const y = Number(parts[0]);
@@ -58,6 +71,62 @@ function renderSocInfo(s){
   );
 }
 
+function renderPrefSummary(months, prefObj){
+  const rows = [];
+  for(let i=1;i<=months.length;i++){
+    const val = toNum(prefObj["شهر " + i]);
+    if(val > 0){
+      const key = normalizeMonthKey(months[i-1]);
+      rows.push({
+        شهر_ميلادي: monthLabelGregorian(key),
+        شهر_هجري: monthLabelHijriFromYYYYMM(key),
+        اسهم: val
+      });
+    }
+  }
+
+  if(rows.length === 0){
+    return `<div class="warn warn-gray">لم يتم اختيار رغبات بعد</div>`;
+  }
+
+  let html = `
+    <div class="tableWrap">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>الشهر الميلادي</th>
+            <th>الشهر الهجري</th>
+            <th>عدد الاسهم</th>
+          </tr>
+        </thead>
+        <tbody>
+  `;
+
+  for(const r of rows){
+    html += `
+      <tr>
+        <td data-label="الشهر الميلادي">${esc(r.شهر_ميلادي)}</td>
+        <td data-label="الشهر الهجري">${esc(r.شهر_هجري || "-")}</td>
+        <td data-label="عدد الاسهم"><b>${esc(r.اسهم)}</b></td>
+      </tr>
+    `;
+  }
+
+  const total = rows.reduce((s,x)=>s + toNum(x.اسهم), 0);
+
+  html += `
+        <tr>
+          <td data-label="الاجمالي" colspan="2"><b>الاجمالي</b></td>
+          <td data-label="مجموع"><b>${esc(total)}</b></td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  return html;
+}
+
 function renderJoinBoxForVisitor(){
   return `
     <div class="warn warn-gray">يلزم تسجيل الدخول للمتابعة</div>
@@ -71,7 +140,7 @@ function renderJoinBoxSubscribed(){
   return `<div class="warn warn-gray">انت مشترك مسبقا في هذه الجمعية</div>`;
 }
 
-function renderJoinBoxNewSociety(canJoin, currentShares){
+function renderJoinBoxNewSociety(canJoin){
   if(!canJoin){
     return `<div class="warn warn-gray">التسجيل متاح فقط في جمعية جديدة</div>`;
   }
@@ -79,7 +148,7 @@ function renderJoinBoxNewSociety(canJoin, currentShares){
   return `
     <div class="grid">
       <div class="col-12">
-        <input id="shares" class="input" placeholder="عدد الاسهم مثل 1 او 0.5" value="${esc(currentShares || "")}">
+        <input id="shares" class="input" placeholder="عدد الاسهم مثل 1 او 0.5">
         <div class="note">ملاحظة, يسمح بنصف سهم كحد ادنى</div>
       </div>
       <div class="col-12 align-end">
@@ -87,69 +156,6 @@ function renderJoinBoxNewSociety(canJoin, currentShares){
       </div>
     </div>
   `;
-}
-
-function buildEventMapFromSummary(summary){
-  const map = {};
-  const arr = summary || [];
-  for(const s of arr){
-    const key = String(s.شهر || "").trim();
-    const ev = String(s.مناسبة || "").trim();
-    if(key) map[key] = ev;
-  }
-  return map;
-}
-
-function renderPrefSummary(months, prefObj, eventMap){
-  const rows = [];
-  for(let i=1;i<=months.length;i++){
-    const val = toNum(prefObj["شهر " + i]);
-    if(val > 0){
-      const key = String(months[i-1] || "");
-      rows.push({
-        شهر_ميلادي: monthLabelGregorian(key),
-        شهر_هجري: monthLabelHijriFromYYYYMM(key),
-        مناسبة: String((eventMap && eventMap[key]) || "").trim(),
-        اسهم: val
-      });
-    }
-  }
-
-  if(rows.length === 0){
-    return `<div class="warn warn-gray">لم يتم اختيار رغبات بعد</div>`;
-  }
-
-  let html = `
-    <table class="table">
-      <tr>
-        <th>الشهر الميلادي</th>
-        <th>الشهر الهجري</th>
-        <th>المناسبة</th>
-        <th>عدد الاسهم</th>
-      </tr>
-  `;
-
-  for(const r of rows){
-    html += `
-      <tr>
-        <td>${esc(r.شهر_ميلادي)}</td>
-        <td>${esc(r.شهر_هجري || "-")}</td>
-        <td>${esc(r.مناسبة || "-")}</td>
-        <td><b>${esc(r.اسهم)}</b></td>
-      </tr>
-    `;
-  }
-
-  const total = rows.reduce((s,x)=>s + toNum(x.اسهم), 0);
-
-  html += `
-      <tr>
-        <th colspan="3">الاجمالي</th>
-        <th>${esc(total)}</th>
-      </tr>
-    </table>
-  `;
-  return html;
 }
 
 (async function(){
@@ -213,7 +219,7 @@ function renderPrefSummary(months, prefObj, eventMap){
     if(isSubscribed){
       setHtml("joinBox", renderJoinBoxSubscribed());
     }else{
-      setHtml("joinBox", renderJoinBoxNewSociety(String(soc.حالة) === "جديدة", ""));
+      setHtml("joinBox", renderJoinBoxNewSociety(String(soc.حالة) === "جديدة"));
       document.getElementById("btnJoin").onclick = async function(){
         try{
           const shares = document.getElementById("shares").value;
@@ -229,14 +235,12 @@ function renderPrefSummary(months, prefObj, eventMap){
     if(isSubscribed){
       try{
         const prefState = await get("رغبات حالة", { token: s.token, معرف_الجمعية: sid });
-        const months = prefState.الاشهر || [];
+        const months = (prefState.الاشهر || []).map(normalizeMonthKey);
         const prefObj = prefState.رغبات || null;
-
-        const eventMap = buildEventMapFromSummary(prefState.ملخص || []);
 
         document.getElementById("prefCard").style.display = "";
         if(prefObj){
-          setHtml("prefSummary", renderPrefSummary(months, prefObj, eventMap));
+          setHtml("prefSummary", renderPrefSummary(months, prefObj));
         }else{
           setHtml("prefSummary", `<div class="warn warn-gray">لم يتم اختيار رغبات بعد</div>`);
         }
@@ -244,6 +248,7 @@ function renderPrefSummary(months, prefObj, eventMap){
         if(String(soc.حالة) !== "جديدة"){
           document.getElementById("btnPrefs").style.display = "none";
         }
+
       }catch(e){
         document.getElementById("prefCard").style.display = "none";
       }
