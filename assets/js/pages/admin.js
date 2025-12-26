@@ -1,234 +1,300 @@
-function showPanel(show){
+(function () {
+  const s = جلسة();
+  if (s.token && s.role === "مشترك") {
+    location.href = "member.html";
+    return;
+  }
+})();
+
+document.getElementById("logout").addEventListener("click", function (e) {
+  e.preventDefault();
+  خروج();
+});
+
+function showPanel(show) {
   document.getElementById("loginBox").style.display = show ? "none" : "";
   document.getElementById("adminPanel").style.display = show ? "" : "none";
 }
 
-function showTab(name){
-  document.getElementById("tabSoc").style.display = (name==="soc") ? "" : "none";
-  document.getElementById("tabMem").style.display = (name==="mem") ? "" : "none";
-  document.getElementById("tabNew").style.display = (name==="new") ? "" : "none";
+function setMsg(type, text) {
+  if (typeof msg === "function") msg(type, text);
 }
 
-function setNavBySession(){
+async function adminLogin() {
+  setMsg("", "");
+  try {
+    const رمز = document.getElementById("adminPin").value.trim();
+    const data = await post({ action: "دخول بالرمز", رمز });
+    if (data.دور !== "مدير") throw new Error("هذا الرمز ليس للمدير");
+    حفظ_جلسة(data.token, "مدير");
+    showPanel(true);
+    await loadAdmin();
+  } catch (e) {
+    setMsg("err", e.message);
+  }
+}
+
+async function loadAdmin() {
+  setMsg("", "");
   const s = جلسة();
+  if (!s.token || s.role !== "مدير") {
+    showPanel(false);
+    return;
+  }
+  showPanel(true);
 
-  const navRegister = document.getElementById("navRegister");
-  const navMember = document.getElementById("navMember");
-  const navAdmin = document.getElementById("navAdmin");
-  const logout = document.getElementById("logout");
+  const data = await post({ action: "معلومات مدير", token: s.token });
 
-  if(s && s.token){
-    logout.style.display = "";
-    navRegister.style.display = "none";
+  renderMembers(data.مشتركين || []);
+  renderSocieties(data.جمعيات || []);
+}
 
-    if(s.role === "مدير"){
-      navAdmin.style.display = "";
-      navMember.style.display = "";
-    }else{
-      navAdmin.style.display = "none";
-      navMember.style.display = "";
-    }
-  }else{
-    logout.style.display = "none";
-    navRegister.style.display = "";
-    navAdmin.style.display = "none";
-    navMember.style.display = "none";
+async function createSoc() {
+  setMsg("", "");
+  try {
+    const s = جلسة();
+    if (!s.token || s.role !== "مدير") throw new Error("غير مسجل دخول كمدير");
+
+    const اسم_الجمعية = document.getElementById("socName").value.trim();
+    const تاريخ_البداية = document.getElementById("socStart").value;
+
+    if (!اسم_الجمعية) throw new Error("اسم الجمعية مطلوب");
+    if (!تاريخ_البداية) throw new Error("تاريخ البداية مطلوب");
+
+    await post({
+      action: "انشاء جمعية",
+      token: s.token,
+      اسم_الجمعية,
+      تاريخ_البداية
+    });
+
+    document.getElementById("socName").value = "";
+    document.getElementById("socStart").value = "";
+
+    setMsg("ok", "تم انشاء الجمعية");
+    await loadAdmin();
+  } catch (e) {
+    setMsg("err", e.message);
   }
 }
 
-function bindLogout(){
-  const logout = document.getElementById("logout");
-  if(logout){
-    logout.onclick = (e)=>{
-      e.preventDefault();
-      خروج();
-    };
-  }
-}
-
-function formatSocCard(s){
-  const لون = (s.حالة === "نشطة") ? "#e8fff0" : (s.حالة === "جديدة") ? "#fff0f6" : "#f3f3f3";
-  const border = (s.حالة === "نشطة") ? "#bfead0" : (s.حالة === "جديدة") ? "#ffd1e5" : "#e0e0e0";
-
-  return `
-    <div style="flex:1;min-width:240px;background:${لون};border:1px solid ${border};border-radius:16px;padding:14px">
-      <div style="font-weight:900">${esc(s.اسم)}</div>
-      <div class="small">
-        تاريخ البداية ${esc(s.تاريخ_البداية)}<br>
-        تاريخ النهاية ${esc(s.تاريخ_النهاية)}<br>
-        الحالة ${esc(s.حالة)}<br>
-        عدد المشتركين ${esc(s.عدد_المشتركين)}<br>
-        عدد الاسهم ${esc(s.عدد_الاسهم)}<br>
-        قيمة الجمعية الاجمالي ${esc(s.اجمالي_القيمة)}
-      </div>
-      <div class="mt12 align-end">
-        <a class="btn" href="society.html?معرف=${encodeURIComponent(s.معرف)}">فتح</a>
-      </div>
-    </div>
-  `;
-}
-
-function formatSocDetails(s){
-  return `
-    <div class="warn warn-gray">
-      <b>${esc(s.اسم)}</b><br>
-      معرف الجمعية ${esc(s.معرف)}<br>
-      تاريخ البداية ${esc(s.تاريخ_البداية)}<br>
-      تاريخ النهاية ${esc(s.تاريخ_النهاية)}<br>
-      الحالة ${esc(s.حالة)}<br>
-      عدد المشتركين ${esc(s.عدد_المشتركين)}<br>
-      عدد الاسهم ${esc(s.عدد_الاسهم)}<br>
-      قيمة الجمعية الاجمالي ${esc(s.اجمالي_القيمة)}
-      <div class="mt12 align-end">
-        <a class="btn" href="society.html?معرف=${encodeURIComponent(s.معرف)}">فتح صفحة الجمعية</a>
-      </div>
-      <div class="note">تفاصيل الاعضاء وسجل التعديلات سنفعله في المرحلة الثانية بعد تزويدي بسكربت قوقل والجداول.</div>
-    </div>
-  `;
-}
-
-async function loadSocieties(){
-  const data = await get("قائمة الجمعيات", {});
-  const arr = data.جمعيات || [];
-
-  const cards = arr
-    .filter(x=> (x.حالة==="جديدة" || x.حالة==="نشطة"))
-    .slice(-3)
-    .reverse();
-
-  if(!cards.length){
-    setHtml("socCards", `<div class="warn warn-gray">لا توجد جمعيات</div>`);
-  }else{
-    setHtml("socCards", `<div style="display:flex;gap:12px;flex-wrap:wrap">${cards.map(formatSocCard).join("")}</div>`);
-  }
-
-  const sel = document.getElementById("socSelect");
-  sel.innerHTML = "";
-  const opt0 = document.createElement("option");
-  opt0.value = "";
-  opt0.textContent = "اختر جمعية";
-  sel.appendChild(opt0);
-
-  arr.forEach(s=>{
-    const o = document.createElement("option");
-    o.value = s.معرف;
-    o.textContent = s.اسم + " , " + s.حالة + " , " + s.تاريخ_البداية;
-    sel.appendChild(o);
-  });
-
-  sel.onchange = ()=>{
-    const id = sel.value;
-    const one = arr.find(x=> String(x.معرف)===String(id));
-    setHtml("socDetails", one ? formatSocDetails(one) : "");
-  };
-
-  setHtml("socDetails", "");
-}
-
-async function loadMembers(){
-  const s = جلسة();
-  const data = await get("معلومات مدير", { token:s.token });
-  const arr = data.مشتركين || [];
-
-  if(!arr.length){
-    setHtml("members", `<div class="warn warn-gray">لا يوجد مشتركين</div>`);
+function renderMembers(list) {
+  const box = document.getElementById("members");
+  if (!list.length) {
+    box.innerHTML = "<div class='hint'>لا يوجد مشتركين</div>";
     return;
   }
 
-  setHtml("members", `
-    <div class="tableWrap">
-      <table class="table">
+  const rows = list.map(m => {
+    const رمز = esc(m.رمز || "");
+    return `
+      <tr>
+        <td>${esc(m.الاسم || "")}</td>
+        <td>${esc(m.رقم_الجوال || "")}</td>
+        <td style="font-weight:900;color:#a11757">${رمز}</td>
+        <td>${esc(m.حالة || "")}</td>
+        <td><button class="btn gray" onclick="copyText('${رمز}')">نسخ</button></td>
+      </tr>
+    `;
+  }).join("");
+
+  box.innerHTML = `
+    <div style="overflow:auto">
+      <table class="tbl">
         <thead>
           <tr>
             <th>الاسم</th>
             <th>رقم الجوال</th>
             <th>رمز</th>
+            <th>الحالة</th>
             <th>نسخ</th>
           </tr>
         </thead>
-        <tbody>
-          ${arr.map(m=>`
-            <tr>
-              <td data-label="الاسم">${esc(m.الاسم)}</td>
-              <td data-label="رقم الجوال">${esc(m.رقم_الجوال)}</td>
-              <td data-label="رمز"><b>${esc(m.رمز)}</b></td>
-              <td data-label="نسخ">
-                <button class="btn" onclick="navigator.clipboard.writeText('${String(m.رمز||"").replace(/'/g,"\\'")}')">نسخ</button>
-              </td>
-            </tr>
-          `).join("")}
-        </tbody>
+        <tbody>${rows}</tbody>
       </table>
     </div>
-  `);
+  `;
 }
 
-async function adminLogin(){
-  msg("", "");
-  try{
-    const رمز = document.getElementById("adminPin").value.trim();
-    if(!رمز) throw new Error("رمز PIN مطلوب");
+function renderSocieties(list) {
+  const cardsBox = document.getElementById("socCards");
+  const sel = document.getElementById("socSelect");
+  const details = document.getElementById("socDetails");
 
-    const data = await post({ action:"دخول بالرمز", رمز });
-    if(data.دور !== "مدير") throw new Error("هذا الرمز ليس للمدير");
+  details.innerHTML = "";
 
-    حفظ_جلسة(data.token, "مدير");
-    setNavBySession();
-    showPanel(true);
+  const sorted = (list || []).slice().sort((a, b) => {
+    const da = String(a.تاريخ_البداية || a.تاريخ_البداية || a.تاريخ_البداية || "");
+    const db = String(b.تاريخ_البداية || b.تاريخ_البداية || b.تاريخ_البداية || "");
+    return da < db ? 1 : da > db ? -1 : 0;
+  });
 
-    showTab("soc");
-    await loadSocieties();
-    await loadMembers();
+  // بطاقات: جديدة + نشطة فقط
+  const featured = sorted.filter(x => (x.حالة === "جديدة" || x.حالة === "نشطة"));
 
-    msg("ok", "تم تسجيل دخول المدير");
-  }catch(e){
-    msg("err", e.message || String(e));
+  cardsBox.innerHTML = featured.length ? featured.map(s => {
+    const badge = s.حالة === "نشطة" ? "active" : "new";
+    return `
+      <div class="soc ${badge}" onclick="openSocietyAdmin('${esc(s.معرف)}')">
+        <div class="tag">${esc(s.حالة)}</div>
+        <div class="title">${esc(s.اسم)}</div>
+        <div class="meta">تاريخ البداية ${esc(s.تاريخ_البداية)}</div>
+        <div class="meta">تاريخ النهاية ${esc(s.تاريخ_النهاية)}</div>
+        <div class="meta">عدد المشتركين ${esc(String(s.عدد_المشتركين || 0))}</div>
+        <div class="meta">عدد الاسهم ${esc(String(s.عدد_الاسهم || 0))}</div>
+      </div>
+    `;
+  }).join("") : `<div class="hint">لا توجد جمعيات جديدة او نشطة</div>`;
+
+  // قائمة منسدلة: كل الجمعيات
+  sel.innerHTML = "";
+  sel.insertAdjacentHTML("beforeend", `<option value="">اختر جمعية</option>`);
+  for (const s of sorted) {
+    sel.insertAdjacentHTML("beforeend", `<option value="${esc(s.معرف)}">${esc(s.اسم)} , ${esc(s.حالة)}</option>`);
   }
+
+  sel.onchange = function () {
+    const id = sel.value;
+    if (!id) {
+      details.innerHTML = "";
+      return;
+    }
+    openSocietyAdmin(id);
+  };
 }
 
-async function createSoc(){
-  msg("", "");
-  try{
+async function openSocietyAdmin(socId) {
+  setMsg("", "");
+  try {
     const s = جلسة();
-    const اسم_الجمعية = document.getElementById("socName").value.trim();
-    const تاريخ_البداية = document.getElementById("socStart").value; // من type="date" جاهز yyyy-mm-dd
+    if (!s.token || s.role !== "مدير") throw new Error("غير مسجل دخول كمدير");
 
-    if(!اسم_الجمعية) throw new Error("اسم الجمعية مطلوب");
-    if(!تاريخ_البداية) throw new Error("تاريخ البداية مطلوب");
+    const data = await post({
+      action: "لوحة جمعية للمدير",
+      token: s.token,
+      معرف_الجمعية: socId
+    });
 
-    await post({ action:"انشاء جمعية", token:s.token, اسم_الجمعية, تاريخ_البداية });
-    msg("ok", "تم انشاء الجمعية");
-
-    document.getElementById("socName").value = "";
-    document.getElementById("socStart").value = "";
-
-    showTab("soc");
-    await loadSocieties();
-
-  }catch(e){
-    msg("err", e.message || String(e));
+    renderSocietyAdmin(data);
+  } catch (e) {
+    setMsg("err", e.message);
   }
 }
 
-(function init(){
-  setNavBySession();
-  bindLogout();
+function renderSocietyAdmin(data) {
+  const box = document.getElementById("socDetails");
+  const society = data.جمعية || null;
+  const members = data.اعضاء || [];
+  const changes = data.تغييرات || [];
 
-  document.getElementById("btnAdminLogin").onclick = adminLogin;
+  if (!society) {
+    box.innerHTML = `<div class="hint">لا توجد بيانات</div>`;
+    return;
+  }
 
-  document.getElementById("tabSocBtn").onclick = async ()=>{ showTab("soc"); await loadSocieties(); };
-  document.getElementById("tabMemBtn").onclick = async ()=>{ showTab("mem"); await loadMembers(); };
-  document.getElementById("tabNewBtn").onclick = ()=>{ showTab("new"); };
+  const monthHeaders = [];
+  for (let i = 1; i <= 10; i++) monthHeaders.push(`<th>${i}</th>`);
 
-  document.getElementById("btnCreateSoc").onclick = createSoc;
+  const memberRows = members.map(r => {
+    const months = (r.اشهر || []);
+    const monthTds = [];
+    for (let i = 0; i < 10; i++) monthTds.push(`<td>${esc(String(months[i] || 0))}</td>`);
+    return `
+      <tr>
+        <td>${esc(r.الاسم || "")}</td>
+        <td>${esc(String(r.عدد_الاسهم || 0))}</td>
+        ${monthTds.join("")}
+        <td style="font-weight:900">${esc(String(r.اجمالي || 0))}</td>
+      </tr>
+    `;
+  }).join("");
 
-  const s = جلسة();
-  if(s && s.token && s.role==="مدير"){
-    showPanel(true);
-    showTab("soc");
-    loadSocieties();
-    loadMembers();
-  }else{
+  const changeRows = changes.length ? changes.map(x => {
+    return `
+      <tr>
+        <td>${esc(x.الاسم || "")}</td>
+        <td>${esc(x.الحالة || "")}</td>
+        <td>${esc(x.تاريخ_اول_اشتراك || "")}</td>
+        <td>${esc(x.تاريخ_اخر_تعديل || "")}</td>
+        <td>${esc(String(x.اسهم_قبل || ""))}</td>
+        <td>${esc(String(x.اسهم_بعد || ""))}</td>
+      </tr>
+    `;
+  }).join("") : `<tr><td colspan="6">لا توجد تغييرات</td></tr>`;
+
+  box.innerHTML = `
+    <div class="card" style="margin-top:12px">
+      <h3>تفاصيل الجمعية</h3>
+      <div class="meta">اسم الجمعية ${esc(society.اسم)}</div>
+      <div class="meta">الحالة ${esc(society.حالة)}</div>
+      <div class="meta">تاريخ البداية ${esc(society.تاريخ_البداية)}</div>
+      <div class="meta">تاريخ النهاية ${esc(society.تاريخ_النهاية)}</div>
+      <div class="meta">عدد المشتركين ${esc(String(society.عدد_المشتركين || 0))}</div>
+      <div class="meta">عدد الاسهم ${esc(String(society.عدد_الاسهم || 0))}</div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <h3>اعضاء الجمعية وتوزيع الاسهم على الاشهر</h3>
+      <div class="hint">يعرض توزيع الاشهر 1 الى 10 حسب جدول الرغبات</div>
+      <div style="overflow:auto">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>المشترك</th>
+              <th>اسهمه</th>
+              ${monthHeaders.join("")}
+              <th>الاجمالي</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${memberRows || `<tr><td colspan="13">لا يوجد اعضاء</td></tr>`}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:12px">
+      <h3>المنسحبون وتعديلات الاسهم</h3>
+      <div class="hint">يعرض تاريخ اول اشتراك واخر تعديل, او انسحاب</div>
+      <div style="overflow:auto">
+        <table class="tbl">
+          <thead>
+            <tr>
+              <th>المشترك</th>
+              <th>النوع</th>
+              <th>اول اشتراك</th>
+              <th>اخر تعديل</th>
+              <th>اسهم قبل</th>
+              <th>اسهم بعد</th>
+            </tr>
+          </thead>
+          <tbody>${changeRows}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function copyText(t) {
+  try {
+    navigator.clipboard.writeText(String(t || ""));
+    setMsg("ok", "تم النسخ");
+  } catch (e) {
+    setMsg("err", "تعذر النسخ");
+  }
+}
+
+// تشغيل تلقائي اذا الجلسة موجودة
+(async function boot() {
+  try {
+    const s = جلسة();
+    if (s.token && s.role === "مدير") {
+      showPanel(true);
+      await loadAdmin();
+    } else {
+      showPanel(false);
+    }
+  } catch (e) {
     showPanel(false);
   }
 })();
