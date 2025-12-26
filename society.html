@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,17 +7,20 @@
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
+
   <div class="top">
     <div class="row">
       <div>
         <a href="index.html" id="navHome">الشاشة الرئيسية</a>
         <a href="register.html" id="navRegister">شاشة التسجيل</a>
+        <a href="member.html" id="navMember" style="display:none">شاشة المشتركين</a>
+        <a href="admin.html" id="navAdmin" style="display:none">شاشة المدير</a>
       </div>
+
       <div style="font-weight:900">جمعية عائلية</div>
+
       <div>
-        <a href="member.html" id="navMember">شاشة المشتركين</a>
-        <a href="admin.html" id="navAdmin">شاشة المدير</a>
-        <a href="#" id="navLogout" style="display:none">خروج</a>
+        <a href="#" id="logout" style="display:none">خروج</a>
       </div>
     </div>
   </div>
@@ -27,11 +30,20 @@
 
     <div class="card">
       <h3>صفحة الجمعية</h3>
-      <div id="socInfo"></div>
-      <div style="margin-top:12px" id="actions"></div>
+      <div id="socInfo" class="small"></div>
+
+      <div class="align-end" style="margin-top:14px">
+        <button id="btnPrefs" style="display:none">ادارة الرغبات</button>
+      </div>
     </div>
 
-    <div class="card">
+    <div class="card" id="prefCard" style="display:none">
+      <h3>رغباتي في هذه الجمعية</h3>
+      <div id="prefSummary"></div>
+      <div class="note">يعرض فقط الاشهر التي اخترتها, ويمكنك تعديلها من زر ادارة الرغبات طالما الجمعية جديدة</div>
+    </div>
+
+    <div class="card" id="joinCard">
       <h3>التسجيل في الجمعية الجديدة</h3>
       <div id="joinBox"></div>
     </div>
@@ -40,7 +52,6 @@
   <script src="assets/js/config.js"></script>
   <script src="assets/js/api.js"></script>
   <script src="assets/js/ui.js"></script>
-  <script src="assets/js/auth_ui.js"></script>
   <script src="assets/js/pages/society.js"></script>
 </body>
 </html>
