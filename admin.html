@@ -1,183 +1,188 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>لوحة المدير</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <link rel="stylesheet" href="assets/css/style.css">
-
-  <style>
-    body {
-      font-family: Tahoma, Arial, sans-serif;
-      background: #f4f6f8;
-      margin: 0;
-      direction: rtl;
-    }
-
-    header {
-      background: #2f8f6b;
-      color: #fff;
-      padding: 16px;
-      font-size: 20px;
-    }
-
-    .container {
-      padding: 16px;
-    }
-
-    .card {
-      background: #fff;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-
-    .card-title {
-      font-size: 18px;
-      margin-bottom: 12px;
-      font-weight: bold;
-    }
-
-    .btn {
-      padding: 10px 16px;
-      border-radius: 8px;
-      border: none;
-      cursor: pointer;
-      font-size: 14px;
-      background: #2f8f6b;
-      color: #fff;
-    }
-
-    .btn.gray {
-      background: #ccc;
-      color: #333;
-    }
-
-    .tabs {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-      margin-bottom: 16px;
-    }
-
-    .tab {
-      padding: 8px 14px;
-      border-radius: 20px;
-      cursor: pointer;
-      background: #e0e0e0;
-      font-size: 14px;
-    }
-
-    .tab.active {
-      background: #2f8f6b;
-      color: #fff;
-    }
-
-    .month-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill,minmax(140px,1fr));
-      gap: 12px;
-    }
-
-    .month-card {
-      border-radius: 12px;
-      padding: 12px;
-      cursor: pointer;
-      color: #333;
-    }
-
-    .month-normal { background:#e8f7ef; }
-    .month-near   { background:#fff3cd; }
-    .month-limit  { background:#ffe0b2; }
-    .month-over   { background:#f8d7da; }
-
-    .month-card h4 {
-      margin: 0 0 6px 0;
-      font-size: 14px;
-    }
-
-    .accordion {
-      margin-top: 12px;
-      border-top: 1px dashed #ccc;
-      padding-top: 12px;
-    }
-
-    .row {
-      display: flex;
-      justify-content: space-between;
-      padding: 6px 0;
-      border-bottom: 1px solid #eee;
-      font-size: 14px;
-    }
-
-    .row:last-child {
-      border-bottom: none;
-    }
-
-    .checkbox {
-      transform: scale(1.2);
-    }
-
-    @media (max-width: 600px) {
-      header {
-        font-size: 18px;
-      }
-    }
-  </style>
+  <link rel="stylesheet" href="assets/css/styles.css" />
 </head>
 
-<body>
+<body class="page-admin">
+  <!-- شريط علوي -->
+  <header class="topbar">
+    <div class="topbar__inner">
 
-<header>
-  لوحة المدير
-</header>
+      <!-- يمين, روابط ثابتة -->
+      <nav class="topbar__nav topbar__nav--right" aria-label="روابط رئيسية">
+        <a class="topbar__link" href="index.html">الشاشة الرئيسية</a>
+        <a class="topbar__link" href="member.html">شاشة المشتركين</a>
+        <a class="topbar__link topbar__link--active" href="admin.html">شاشة المدير</a>
+      </nav>
 
-<div class="container">
+      <!-- العنوان بالمنتصف -->
+      <div class="topbar__title" aria-label="عنوان الصفحة">
+        جمعية عائلية
+      </div>
 
-  <!-- لوحة التحكم -->
-  <div class="card" id="dashboard">
-    <div class="card-title">لوحة التحكم</div>
+      <!-- يسار, تحديث, تواصل, خروج -->
+      <nav class="topbar__nav topbar__nav--left" aria-label="روابط مساعدة">
+        <button class="topbar__link topbar__btnlink" id="refreshBtn" type="button">تحديث</button>
+        <a class="topbar__link" href="contact.html">شاشة التواصل</a>
+        <a class="topbar__link" href="#" id="logout">خروج</a>
+      </nav>
 
-    <button class="btn" onclick="showSocieties()">الجمعيات</button>
-    <button class="btn" onclick="showMembers()">المشتركين</button>
-  </div>
-
-  <!-- تفاصيل جمعية -->
-  <div class="card" id="societyView" style="display:none">
-    <div class="card-title" id="societyName"></div>
-
-    <div id="societyInfo"></div>
-
-    <div class="tabs">
-      <div class="tab active" onclick="switchTab('months')">الرغبات</div>
-      <div class="tab" onclick="switchTab('collection')">التحصيل</div>
-      <div class="tab" onclick="switchTab('delivery')">التسليم</div>
     </div>
+  </header>
 
-    <!-- تبويب الرغبات -->
-    <div id="tab-months">
-      <div class="month-grid" id="monthsGrid"></div>
-    </div>
+  <main class="page">
+    <section class="container">
+      <!-- رسائل عامة -->
+      <div id="msg" class="msg" aria-live="polite"></div>
 
-    <!-- تبويب التحصيل -->
-    <div id="tab-collection" style="display:none">
-      <div class="month-grid" id="collectionGrid"></div>
-    </div>
+      <!-- لوحة التحكم -->
+      <section class="card">
+        <h2 class="card__title">لوحة التحكم</h2>
 
-    <!-- تبويب التسليم -->
-    <div id="tab-delivery" style="display:none">
-      <div class="month-grid" id="deliveryGrid"></div>
-    </div>
+        <div class="segmented">
+          <button id="tabSocieties" class="segmented__btn segmented__btn--active" type="button">
+            الجمعيات
+          </button>
+          <button id="tabMembers" class="segmented__btn" type="button">
+            المشتركين
+          </button>
+        </div>
+      </section>
 
-    <button class="btn gray" onclick="backToDashboard()">رجوع</button>
-  </div>
+      <!-- ====== قسم الجمعيات ====== -->
+      <section id="societiesPanel" class="card">
+        <div class="card__head">
+          <h2 class="card__title">الجمعيات</h2>
+          <div class="card__meta" id="societiesHint"></div>
+        </div>
 
-</div>
+        <!-- قائمة بطاقات الجمعيات -->
+        <div id="societiesList" class="cardsGrid" aria-label="قائمة الجمعيات"></div>
 
-<script src="assets/js/api.js"></script>
-<script src="assets/js/admin.js"></script>
+        <!-- تفاصيل جمعية محددة, تظهر عند اختيار بطاقة -->
+        <div id="societyDetails" class="societyDetails hidden" aria-label="تفاصيل الجمعية">
+          <div class="divider"></div>
 
+          <div class="societyDetails__head">
+            <div>
+              <h3 class="societyDetails__title" id="societyTitle">تفاصيل الجمعية</h3>
+              <div class="societyDetails__sub" id="societySub"></div>
+            </div>
+
+            <div class="societyDetails__actions">
+              <button class="btn btn--ghost" type="button" id="closeSocietyDetails">إغلاق</button>
+            </div>
+          </div>
+
+          <!-- ملخص الجمعية -->
+          <section class="miniCard">
+            <h4 class="miniCard__title">ملخص</h4>
+            <div id="societySummary" class="kvGrid"></div>
+          </section>
+
+          <!-- بطاقات الشهور -->
+          <section class="miniCard">
+            <div class="miniCard__head">
+              <h4 class="miniCard__title">أشهر الجمعية</h4>
+              <div class="miniCard__hint">
+                تظهر 10 بطاقات, كل بطاقة تمثل شهر, اللون لاحقا يتغير حسب الازدحام
+              </div>
+            </div>
+
+            <div id="monthsGrid" class="monthsGrid" aria-label="بطاقات الشهور"></div>
+
+            <!-- تفاصيل شهر -->
+            <div id="monthDetails" class="monthDetails hidden" aria-label="تفاصيل الشهر">
+              <div class="divider"></div>
+
+              <div class="monthDetails__head">
+                <div>
+                  <h4 class="monthDetails__title" id="monthTitle">تفاصيل الشهر</h4>
+                  <div class="monthDetails__sub" id="monthSub"></div>
+                </div>
+
+                <div class="monthDetails__actions">
+                  <button class="btn btn--ghost" type="button" id="closeMonthDetails">إغلاق</button>
+                </div>
+              </div>
+
+              <!-- مكان عرض بيانات الشهر, مشتركين, أسهم, متبقي, إلخ -->
+              <div id="monthBody" class="monthBody"></div>
+            </div>
+          </section>
+
+          <!-- التحصيل, هيكل فقط -->
+          <section class="miniCard">
+            <div class="miniCard__head">
+              <h4 class="miniCard__title">التحصيل</h4>
+              <div class="miniCard__hint">
+                هذا قسم جاهز للمرحلة القادمة, داخل كل شهر سيكون قائمة المشتركين, تشيك بوكس, ملاحظات, ومجموع يطابق إجمالي التحصيل
+              </div>
+            </div>
+
+            <div class="placeholder">
+              <div class="placeholder__line">لم يتم تفعيل اكشنات التحصيل بعد</div>
+              <div class="placeholder__line">سيتم ربطه لاحقا مع السجل والاشتراكات والرغبات</div>
+            </div>
+          </section>
+
+          <!-- التسليم, هيكل فقط -->
+          <section class="miniCard">
+            <div class="miniCard__head">
+              <h4 class="miniCard__title">التسليم</h4>
+              <div class="miniCard__hint">
+                هذا قسم جاهز للمرحلة القادمة, التسليم ممنوع يكون جزئي, تشيك بوكس لكل مستحق في الشهر, والمجموع يطابق إجمالي التسليم 100٪
+              </div>
+            </div>
+
+            <div class="placeholder">
+              <div class="placeholder__line">لم يتم تفعيل اكشنات التسليم بعد</div>
+              <div class="placeholder__line">سيتم حصر المستحقين حسب رغبات الشهر فقط</div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <!-- ====== قسم المشتركين ====== -->
+      <section id="membersPanel" class="card hidden">
+        <div class="card__head">
+          <h2 class="card__title">المشتركين</h2>
+          <div class="card__meta" id="membersHint"></div>
+        </div>
+
+        <div class="tableWrap" aria-label="قائمة المشتركين">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>الاسم</th>
+                <th>الجوال</th>
+                <th>PIN</th>
+                <th>نسخ</th>
+                <th>تفاصيل</th>
+              </tr>
+            </thead>
+            <tbody id="membersTbody"></tbody>
+          </table>
+        </div>
+
+        <div class="note">
+          زر التفاصيل مجرد مكان جاهز, صفحة تفاصيل المشترك نجهزها لاحقا حسب اتفاقنا
+        </div>
+      </section>
+
+    </section>
+  </main>
+
+  <!-- ملفات الجافا سكربت, لا تغيير -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/auth_ui.js"></script>
+  <script src="assets/js/pages/admin.js"></script>
 </body>
 </html>
