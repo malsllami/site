@@ -3,28 +3,29 @@ function q(name){
 }
 
 function round2(x){
-  return Math.round(Number(x||0) * 2) / 2;
+  const n = Number(String(x||"").trim() || 0);
+  return Math.round(n * 2) / 2;
 }
 
 function buildTable(months, shares){
   let html = `
     <div style="margin-bottom:10px">عدد اسهمك <b>${esc(shares)}</b></div>
-    <table style="width:100%;border-collapse:collapse">
+    <table class="table">
       <tr>
-        <th style="text-align:right;padding:8px;border-bottom:1px solid #ddd">الشهر</th>
-        <th style="text-align:right;padding:8px;border-bottom:1px solid #ddd">عدد الاسهم</th>
-        <th style="text-align:right;padding:8px;border-bottom:1px solid #ddd">النوع</th>
+        <th>الشهر</th>
+        <th>عدد الاسهم</th>
+        <th>النوع</th>
       </tr>
   `;
   for(let i=0;i<months.length;i++){
     html += `
       <tr>
-        <td style="padding:8px;border-bottom:1px solid #eee">${esc(months[i])}</td>
-        <td style="padding:8px;border-bottom:1px solid #eee">
-          <input class="input" style="max-width:160px" id="m${i+1}" value="0" placeholder="0 او 0.5 او 1">
+        <td>${esc(months[i])}</td>
+        <td>
+          <input class="input" id="m${i+1}" value="0" placeholder="0 او 0.5 او 1">
         </td>
-        <td style="padding:8px;border-bottom:1px solid #eee">
-          <select class="input" style="max-width:180px" id="t${i+1}">
+        <td>
+          <select class="input" id="t${i+1}">
             <option value="قابل للتعديل">قابل للتعديل</option>
             <option value="ضروري">ضروري</option>
           </select>
@@ -38,32 +39,38 @@ function buildTable(months, shares){
 
 function renderWarnings(summary, months){
   let html = "";
-
-  html += `<div style="margin-top:12px"></div>`;
   for(let i=0;i<summary.length;i++){
     const s = summary[i];
     if(s.حالة === "تجاوز"){
       html += `<div class="warn warn-red">تم تجاوز القدرة المتاحة للتسليم في شهر ${esc(months[i])}</div>`;
     }else if(s.حالة === "حد"){
       html += `<div class="warn warn-orange">هذا الشهر قريب من الحد الاقصى للتسليم ${esc(months[i])}</div>`;
-    }else if(s.نسبة >= 0.75){
+    }else if(Number(s.نسبة||0) >= 0.75){
       html += `<div class="warn warn-orange">هذا الشهر عليه ضغط عالي ${esc(months[i])}</div>`;
     }
     if(s.مناسبة){
       html += `<div class="warn warn-gray">هذا الشهر موسم مصاريف ${esc(s.مناسبة)}</div>`;
     }
   }
-
   return html || `<div class="warn warn-gray">لا توجد تحذيرات</div>`;
 }
 
 function sumInputs(monthCount){
   let sum = 0;
   for(let i=1;i<=monthCount;i++){
-    const v = round2(document.getElementById("m"+i).value);
-    sum += v;
+    sum += round2(document.getElementById("m"+i).value);
   }
   return sum;
+}
+
+function fillExisting(existing, monthCount){
+  if(!existing) return;
+  for(let i=1;i<=monthCount;i++){
+    const v = existing["شهر "+i];
+    const t = existing["نوع "+i];
+    if(document.getElementById("m"+i)) document.getElementById("m"+i).value = String(v||0);
+    if(document.getElementById("t"+i)) document.getElementById("t"+i).value = (String(t)==="ضروري") ? "ضروري" : "قابل للتعديل";
+  }
 }
 
 (async function(){
@@ -98,16 +105,12 @@ function sumInputs(monthCount){
       return;
     }
 
-    if(data.موجودة){
-      setHtml("prefBox", "<div class='warn warn-gray'>تم حفظ رغباتك مسبقا, لا يمكن التعديل</div>");
-      document.getElementById("btnSave").style.display = "none";
-      return;
-    }
-
     setHtml("prefBox", buildTable(months, shares));
+    fillExisting(data.رغبات || null, months.length);
+
+    // تحذيرات عامة الجمعية
     setHtml("warnings", renderWarnings(data.ملخص || [], months));
 
-    // تحذير اسفل الجدول حسب مجموع اسهم المشترك
     function updateTotalHint(){
       const sum = sumInputs(months.length);
       let hint = "";
