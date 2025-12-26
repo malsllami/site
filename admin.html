@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -71,14 +71,16 @@
 
       <div class="card" id="tabNew" style="display:none">
         <h3>انشاء جمعية جديدة</h3>
-        <div class="note">سيتم منع تكرار اسم الجمعية, وتم منع تكرار نفس تاريخ البداية</div>
+        <div class="note">اختر تاريخ البداية من التقويم</div>
 
         <div class="mt12" style="display:flex;gap:10px;flex-wrap:wrap">
           <div style="flex:1;min-width:220px">
             <input class="input" id="socName" placeholder="اسم الجمعية">
           </div>
+
           <div style="flex:1;min-width:220px">
-            <input class="input" id="socStart" placeholder="تاريخ البداية مثل 2026-01-01">
+            <input class="input" id="socStart" type="date" placeholder="تاريخ البداية">
+            <div class="note">سيتم الحفظ بصيغة yyyy-mm-dd تلقائيا</div>
           </div>
         </div>
 
