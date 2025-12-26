@@ -18,6 +18,8 @@ html,body{
   font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial;
   color:var(--text);
   background: linear-gradient(180deg, var(--bg1), var(--bg2));
+  direction: rtl;               /* مهم */
+  text-align: right;            /* مهم */
 }
 
 a{ text-decoration:none; color:inherit; }
@@ -26,6 +28,7 @@ a{ text-decoration:none; color:inherit; }
   background:var(--top);
   color:#fff;
   padding:14px 12px;
+  width:100%;
 }
 
 .top .row{
@@ -34,17 +37,19 @@ a{ text-decoration:none; color:inherit; }
   justify-content:space-between;
   gap:10px;
   flex-wrap:wrap;
+  width:100%;
 }
 
 .brand{
   font-weight:900;
-  letter-spacing:0;
+  white-space:nowrap;
 }
 
 .nav{
   display:flex;
   gap:10px;
   flex-wrap:wrap;
+  align-items:center;
 }
 
 .nav a{
@@ -54,12 +59,12 @@ a{ text-decoration:none; color:inherit; }
   transition:all .2s ease;
   opacity:.95;
   white-space:nowrap;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
 }
 
-.nav a:hover{
-  background:rgba(255,255,255,.12);
-  opacity:1;
-}
+.nav a:hover{ background:rgba(255,255,255,.12); opacity:1; }
 
 .container{
   width:min(1100px, 92vw);
@@ -139,17 +144,17 @@ button:active{ transform:scale(.99); }
 .warn-orange{ background:#fff4e5; border-color:#ffe0b3; }
 .warn-red{ background:#ffeaea; border-color:#ffc7c7; }
 
+/* جداول */
 .tableWrap{
   width:100%;
-  overflow:auto;
   border-radius:16px;
   border:1px solid var(--border);
+  background:#fff;
 }
 
 .table{
   width:100%;
   border-collapse:collapse;
-  min-width:820px;
   background:#fff;
 }
 
@@ -165,51 +170,77 @@ button:active{ transform:scale(.99); }
   font-weight:800;
 }
 
-.cellTitle{
-  font-weight:800;
-}
+.cellTitle{ font-weight:800; }
+.cellSub{ font-size:12px; color:var(--muted); margin-top:2px; }
 
-.cellSub{
-  font-size:12px;
-  color:var(--muted);
-  margin-top:2px;
-}
-
-/* تحسين للجوال والايباد */
+/* تحسينات للتابلت */
 @media (max-width: 900px){
-  .container{
-    width:min(980px, 94vw);
-  }
-  .card{
-    padding:16px;
-  }
-  h3{
-    font-size:18px;
-  }
+  .container{ width:min(980px, 94vw); }
+  .card{ padding:16px; }
+  h3{ font-size:18px; }
 }
 
+/* Responsive قوي للجوال: تحويل الجدول الى بطاقات */
 @media (max-width: 600px){
-  .top{
-    padding:12px 10px;
+  .container{ width:94vw; }
+
+  .top{ padding:12px 10px; }
+  .top .row{
+    flex-direction:column;
+    align-items:stretch;
+    gap:8px;
   }
+
   .brand{
     width:100%;
     text-align:center;
     font-size:18px;
   }
+
   .nav{
     width:100%;
-    justify-content:center;
+    justify-content:space-between;
   }
+
   .nav a{
-    padding:8px 10px;
+    flex:1;
+    text-align:center;
     font-size:14px;
+    padding:10px 10px;
   }
-  .card{
-    padding:14px;
+
+  /* تحويل الجدول لبطاقات */
+  .tableWrap{ border:none; background:transparent; }
+  .table{ border-collapse:separate; border-spacing:0 12px; }
+  .table thead{ display:none; }
+
+  .table tr{
+    display:block;
+    background:#fff;
+    border:1px solid var(--border);
     border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:10px 12px;
   }
-  .table{
-    min-width:760px;
+
+  .table td{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid #f2f2f2;
+    padding:10px 0;
+    text-align:right;
   }
+
+  .table td:last-child{ border-bottom:none; }
+
+  .table td::before{
+    content: attr(data-label);
+    color: var(--muted);
+    font-weight:800;
+    padding-left:10px;
+    white-space:nowrap;
+  }
+
+  .cellSub{ display:none; } /* اخفاء السطر الصغير للجوال لتخفيف الزحمة */
 }
