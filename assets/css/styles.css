@@ -1,165 +1,246 @@
-/* ===== إضافات خاصة بلوحة المدير, آمنة ولا تؤثر على باقي الصفحات ===== */
+:root{
+  --top:#0e6f7f;
+  --bg1:#dfeff2;
+  --bg2:#eef7f8;
+  --card:#ffffff;
+  --text:#0b0f14;
+  --muted:#6c7a86;
+  --border:#e6e6e6;
+  --shadow:0 10px 25px rgba(0,0,0,.08);
+  --radius:18px;
+}
 
-.cardHead{
+*{ box-sizing:border-box; }
+
+html,body{
+  margin:0;
+  padding:0;
+  font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial;
+  color:var(--text);
+  background: linear-gradient(180deg, var(--bg1), var(--bg2));
+  direction: rtl;               /* مهم */
+  text-align: right;            /* مهم */
+}
+
+a{ text-decoration:none; color:inherit; }
+
+.top{
+  background:var(--top);
+  color:#fff;
+  padding:14px 12px;
+  width:100%;
+}
+
+.top .row{
   display:flex;
-  align-items:flex-start;
+  align-items:center;
   justify-content:space-between;
-  gap:12px;
+  gap:10px;
   flex-wrap:wrap;
+  width:100%;
 }
 
-.pillLabel{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  padding:8px 12px;
-  border-radius:999px;
-  background:#f5fbfc;
-  border:1px solid var(--border);
+.brand{
   font-weight:900;
-  font-size:13px;
-  color:var(--text);
-  margin-bottom:8px;
+  white-space:nowrap;
 }
 
-.pill{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  padding:8px 12px;
-  border-radius:999px;
-  border:1px solid var(--border);
-  background:#fff;
-  font-weight:800;
-  font-size:13px;
-  color:var(--text);
-}
-
-.tabs{
+.nav{
   display:flex;
   gap:10px;
   flex-wrap:wrap;
+  align-items:center;
 }
 
-.tabBtn{
-  background:#ffffff;
-  border:1px solid var(--border);
-  color:var(--text);
-  padding:10px 14px;
-  border-radius:999px;
-  cursor:pointer;
-  font-weight:900;
+.nav a{
+  color:#fff;
+  padding:8px 12px;
+  border-radius:12px;
+  transition:all .2s ease;
+  opacity:.95;
+  white-space:nowrap;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
 }
 
-.tabBtn.active{
-  background:rgba(14,111,127,.12);
-  border-color:#b9dfe6;
+.nav a:hover{ background:rgba(255,255,255,.12); opacity:1; }
+
+.container{
+  width:min(1100px, 92vw);
+  margin:18px auto 40px;
 }
 
-.btn2{
-  background:#ffffff;
-  border:1px solid var(--border);
-  color:var(--text);
-}
-
-.divider{
-  height:1px;
-  background:#eee;
+.card{
+  background:var(--card);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:18px;
   margin:14px 0;
 }
 
-.monthsGrid{
-  display:grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap:12px;
-  margin-top:12px;
+h3{
+  margin:0 0 12px 0;
+  font-size:20px;
 }
 
-.monthCard{
-  border-radius:18px;
+.small{ font-size:14px; color:var(--muted); line-height:1.9; }
+.muted{ color:var(--muted); }
+
+.align-end{
+  display:flex;
+  justify-content:flex-end;
+  align-items:center;
+  gap:10px;
+}
+
+.mt8{ margin-top:8px; }
+.mt12{ margin-top:12px; }
+
+button, .btn{
+  background:var(--top);
+  border:none;
+  color:#fff;
+  padding:10px 16px;
+  border-radius:14px;
+  cursor:pointer;
+  font-weight:700;
+}
+
+button:active{ transform:scale(.99); }
+
+.input{
+  width:100%;
+  padding:10px 12px;
+  border:1px solid var(--border);
+  border-radius:14px;
+  font-size:15px;
+  outline:none;
+  background:#fff;
+}
+
+.input:focus{
+  border-color:#b9dfe6;
+  box-shadow:0 0 0 3px rgba(14,111,127,.12);
+}
+
+.note{
+  margin-top:8px;
+  font-size:13px;
+  color:var(--muted);
+}
+
+.warn{
+  border-radius:14px;
+  padding:10px 12px;
+  margin:8px 0;
+  font-size:14px;
+  border:1px solid var(--border);
+  background:#f7f7f7;
+}
+
+.warn-gray{ background:#f7f7f7; }
+.warn-green{ background:#e8fff0; border-color:#bfead0; }
+.warn-orange{ background:#fff4e5; border-color:#ffe0b3; }
+.warn-red{ background:#ffeaea; border-color:#ffc7c7; }
+
+/* جداول */
+.tableWrap{
+  width:100%;
+  border-radius:16px;
   border:1px solid var(--border);
   background:#fff;
-  box-shadow:var(--shadow);
-  padding:14px;
-  cursor:pointer;
-  transition:transform .12s ease;
 }
 
-.monthCard:active{ transform:scale(.99); }
-
-.monthHead{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:10px;
+.table{
+  width:100%;
+  border-collapse:collapse;
+  background:#fff;
 }
 
-.monthTitle{ font-weight:1000; }
-.monthKey{ font-size:12px; color:var(--muted); }
-
-.monthStats{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
+.table th, .table td{
+  padding:12px 12px;
+  border-bottom:1px solid #f0f0f0;
+  text-align:right;
+  vertical-align:middle;
 }
 
-.monthHint{
-  margin-top:10px;
-  font-size:12px;
-  color:var(--muted);
+.table th{
+  background:#fbfbfb;
   font-weight:800;
 }
 
-/* ألوان حالة الشهر */
-.month-normal{ background:#ffffff; }
-.month-near{ background:#fff7e6; border-color:#ffe0b3; }
-.month-limit{ background:#fff1f1; border-color:#ffcccc; }
-.month-over{ background:#ffeaea; border-color:#ffb3b3; }
+.cellTitle{ font-weight:800; }
+.cellSub{ font-size:12px; color:var(--muted); margin-top:2px; }
 
-.socCard{
-  border-radius:18px;
-  border:1px solid var(--border);
-  background:#fff;
-  box-shadow:var(--shadow);
-  padding:14px;
-  cursor:pointer;
-}
-
-.socHead{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-}
-
-.socTitle{
-  font-weight:1000;
-  font-size:16px;
-}
-
-.socMeta, .socStats{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-top:10px;
-}
-
-.socHint{
-  margin-top:10px;
-  font-size:12px;
-  color:var(--muted);
-  font-weight:900;
-}
-
-.socActive{ border-color:#bfead0; background:#f4fff8; }
-.socClosed{ border-color:#e5e5e5; background:#fafafa; }
-.socNew{ border-color:#ffd0e3; background:#fff5fa; }
-
+/* تحسينات للتابلت */
 @media (max-width: 900px){
-  .monthsGrid{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .container{ width:min(980px, 94vw); }
+  .card{ padding:16px; }
+  h3{ font-size:18px; }
 }
 
+/* Responsive قوي للجوال: تحويل الجدول الى بطاقات */
 @media (max-width: 600px){
-  .monthsGrid{ grid-template-columns: repeat(1, minmax(0, 1fr)); }
+  .container{ width:94vw; }
+
+  .top{ padding:12px 10px; }
+  .top .row{
+    flex-direction:column;
+    align-items:stretch;
+    gap:8px;
+  }
+
+  .brand{
+    width:100%;
+    text-align:center;
+    font-size:18px;
+  }
+
+  .nav{
+    width:100%;
+    justify-content:space-between;
+  }
+
+  .nav a{
+    flex:1;
+    text-align:center;
+    font-size:14px;
+    padding:10px 10px;
+  }
+
+  /* تحويل الجدول لبطاقات */
+  .tableWrap{ border:none; background:transparent; }
+  .table{ border-collapse:separate; border-spacing:0 12px; }
+  .table thead{ display:none; }
+
+  .table tr{
+    display:block;
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:16px;
+    box-shadow:var(--shadow);
+    padding:10px 12px;
+  }
+
+  .table td{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid #f2f2f2;
+    padding:10px 0;
+    text-align:right;
+  }
+
+  .table td:last-child{ border-bottom:none; }
+
+  .table td::before{
+    content: attr(data-label);
+    color: var(--muted);
+    font-weight:800;
+    padding-left:10px;
+    white-space:nowrap;
+  }
+
+  .cellSub{ display:none; } /* اخفاء السطر الصغير للجوال لتخفيف الزحمة */
 }
