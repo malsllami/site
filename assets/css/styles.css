@@ -1,3 +1,4 @@
+/* assets/css/styles.css  , انسخه واستبدله بالكامل */
 :root{
   --top:#0e6f7f;
   --bg1:#dfeff2;
@@ -8,6 +9,11 @@
   --border:#e6e6e6;
   --shadow:0 10px 25px rgba(0,0,0,.08);
   --radius:18px;
+
+  /* بادجات */
+  --green:#1f8a4c;
+  --gray:#6c7a86;
+  --pink:#a11757;
 }
 
 *{ box-sizing:border-box; }
@@ -18,8 +24,8 @@ html,body{
   font-family: system-ui, -apple-system, "Segoe UI", Tahoma, Arial;
   color:var(--text);
   background: linear-gradient(180deg, var(--bg1), var(--bg2));
-  direction: rtl;               /* مهم */
-  text-align: right;            /* مهم */
+  direction: rtl;
+  text-align: right;
 }
 
 a{ text-decoration:none; color:inherit; }
@@ -79,6 +85,14 @@ a{ text-decoration:none; color:inherit; }
   margin:14px 0;
 }
 
+.cardHead{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
 h3{
   margin:0 0 12px 0;
   font-size:20px;
@@ -104,10 +118,18 @@ button, .btn{
   padding:10px 16px;
   border-radius:14px;
   cursor:pointer;
-  font-weight:700;
+  font-weight:800;
+}
+
+.btn2{
+  background: rgba(255,255,255,.15);
+  border:1px solid rgba(255,255,255,.25);
+  color:#fff;
 }
 
 button:active{ transform:scale(.99); }
+
+.w100{ width:100%; }
 
 .input{
   width:100%;
@@ -144,6 +166,110 @@ button:active{ transform:scale(.99); }
 .warn-orange{ background:#fff4e5; border-color:#ffe0b3; }
 .warn-red{ background:#ffeaea; border-color:#ffc7c7; }
 
+/* رسائل */
+.msg{
+  border-radius:14px;
+  padding:10px 12px;
+  margin:10px 0;
+  border:1px solid var(--border);
+  background:#f7f7f7;
+  font-weight:800;
+}
+.msg.ok{ background:#e8fff0; border-color:#bfead0; }
+.msg.err{ background:#ffeaea; border-color:#ffc7c7; }
+
+/* شبكة عامة */
+.grid{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+}
+.col-12{ width:100%; }
+.col-8{ width: calc(66.666% - 6px); }
+.col-6{ width: calc(50% - 6px); }
+.col-4{ width: calc(33.333% - 8px); }
+.col-3{ width: calc(25% - 9px); }
+
+@media (max-width: 900px){
+  .col-8, .col-6, .col-4, .col-3{ width:100%; }
+}
+
+/* كبسولة عنوان الحقل */
+.field{ display:flex; flex-direction:column; gap:8px; }
+.labelPill{
+  display:inline-flex;
+  align-items:center;
+  justify-content:flex-start;
+  padding:8px 12px;
+  border-radius:999px;
+  background:rgba(255,255,255,.9);
+  border:1px solid var(--border);
+  font-weight:900;
+  color:var(--text);
+  width:fit-content;
+}
+
+/* بطاقات الجمعيات */
+.soc{
+  border:1px solid var(--border);
+  border-radius:18px;
+  background:#fff;
+  box-shadow:var(--shadow);
+  padding:14px;
+  cursor:pointer;
+  transition:transform .15s ease;
+}
+.soc:hover{ transform:translateY(-1px); }
+.soc .socTop{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:10px;
+}
+.soc .socBody{ color:var(--muted); font-size:14px; line-height:1.9; }
+.soc .socActions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+  margin-top:12px;
+}
+
+/* بادج الحالة */
+.badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:6px 10px;
+  border-radius:999px;
+  font-weight:900;
+  font-size:13px;
+  border:1px solid rgba(0,0,0,.06);
+}
+.badge.green{ background:rgba(31,138,76,.12); color:var(--green); }
+.badge.gray{ background:rgba(108,122,134,.12); color:var(--gray); }
+.badge.pink{ background:rgba(161,23,87,.10); color:var(--pink); }
+
+/* تبويبات */
+.tabs{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.tab{
+  border:1px solid var(--border);
+  background:#fff;
+  color:var(--text);
+  padding:10px 14px;
+  border-radius:999px;
+  cursor:pointer;
+  font-weight:900;
+}
+.tab.active{
+  background:rgba(14,111,127,.12);
+  border-color:rgba(14,111,127,.20);
+}
+
 /* جداول */
 .tableWrap{
   width:100%;
@@ -167,11 +293,88 @@ button:active{ transform:scale(.99); }
 
 .table th{
   background:#fbfbfb;
-  font-weight:800;
+  font-weight:900;
 }
 
-.cellTitle{ font-weight:800; }
+.cellTitle{ font-weight:900; }
 .cellSub{ font-size:12px; color:var(--muted); margin-top:2px; }
+
+/* بطاقات الأشهر داخل جمعية المدير */
+.monthsGrid{
+  display:grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap:12px;
+}
+
+@media (max-width: 1000px){
+  .monthsGrid{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 650px){
+  .monthsGrid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+.month-card{
+  border-radius:18px;
+  border:1px solid var(--border);
+  background:#fff;
+  box-shadow:var(--shadow);
+  padding:14px;
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+}
+.month-card h4{
+  margin:0 0 8px 0;
+  font-size:16px;
+  font-weight:900;
+}
+.month-card .meta{
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.8;
+}
+.month-card .stripe{
+  position:absolute;
+  top:0;
+  left:0;
+  right:0;
+  height:8px;
+  opacity:.95;
+}
+
+/* حالات شهر (حسب قدرة التسليم) */
+.month-ok .stripe{ background: rgba(31,138,76,.35); }
+.month-near .stripe{ background: rgba(255,165,0,.40); }
+.month-limit .stripe{ background: rgba(255,140,0,.55); }
+.month-over .stripe{ background: rgba(220,20,60,.55); }
+
+.accordion{
+  margin-top:12px;
+  border-top:1px dashed rgba(0,0,0,.10);
+  padding-top:10px;
+}
+.accRow{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  padding:8px 0;
+  border-bottom:1px solid rgba(0,0,0,.06);
+  font-size:14px;
+}
+.accRow:last-child{ border-bottom:none; }
+
+.pillSmall{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:6px 10px;
+  border-radius:999px;
+  border:1px solid rgba(0,0,0,.08);
+  background:rgba(255,255,255,.75);
+  font-weight:900;
+  font-size:12px;
+}
 
 /* تحسينات للتابلت */
 @media (max-width: 900px){
@@ -237,177 +440,18 @@ button:active{ transform:scale(.99); }
   .table td::before{
     content: attr(data-label);
     color: var(--muted);
-    font-weight:800;
+    font-weight:900;
     padding-left:10px;
     white-space:nowrap;
   }
 
-  .cellSub{ display:none; } /* اخفاء السطر الصغير للجوال لتخفيف الزحمة */
+  .cellSub{ display:none; }
 }
 
-
-/* ===== إضافات خاصة بلوحة المدير, آمنة ولا تؤثر على باقي الصفحات ===== */
-
-.cardHead{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap;
+/* ثيم المدير , تدرج بين الأخضر الفاتح والسماوي */
+.admin-theme{
+  background: linear-gradient(180deg, #d7f3ef, #e9fbff);
 }
-
-.pillLabel{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  padding:8px 12px;
-  border-radius:999px;
-  background:#f5fbfc;
-  border:1px solid var(--border);
-  font-weight:900;
-  font-size:13px;
-  color:var(--text);
-  margin-bottom:8px;
-}
-
-.pill{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  padding:8px 12px;
-  border-radius:999px;
-  border:1px solid var(--border);
-  background:#fff;
-  font-weight:800;
-  font-size:13px;
-  color:var(--text);
-}
-
-.tabs{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-.tabBtn{
-  background:#ffffff;
-  border:1px solid var(--border);
-  color:var(--text);
-  padding:10px 14px;
-  border-radius:999px;
-  cursor:pointer;
-  font-weight:900;
-}
-
-.tabBtn.active{
-  background:rgba(14,111,127,.12);
-  border-color:#b9dfe6;
-}
-
-.btn2{
-  background:#ffffff;
-  border:1px solid var(--border);
-  color:var(--text);
-}
-
-.divider{
-  height:1px;
-  background:#eee;
-  margin:14px 0;
-}
-
-.monthsGrid{
-  display:grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap:12px;
-  margin-top:12px;
-}
-
-.monthCard{
-  border-radius:18px;
-  border:1px solid var(--border);
-  background:#fff;
-  box-shadow:var(--shadow);
-  padding:14px;
-  cursor:pointer;
-  transition:transform .12s ease;
-}
-
-.monthCard:active{ transform:scale(.99); }
-
-.monthHead{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:10px;
-  margin-bottom:10px;
-}
-
-.monthTitle{ font-weight:1000; }
-.monthKey{ font-size:12px; color:var(--muted); }
-
-.monthStats{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-}
-
-.monthHint{
-  margin-top:10px;
-  font-size:12px;
-  color:var(--muted);
-  font-weight:800;
-}
-
-/* ألوان حالة الشهر */
-.month-normal{ background:#ffffff; }
-.month-near{ background:#fff7e6; border-color:#ffe0b3; }
-.month-limit{ background:#fff1f1; border-color:#ffcccc; }
-.month-over{ background:#ffeaea; border-color:#ffb3b3; }
-
-.socCard{
-  border-radius:18px;
-  border:1px solid var(--border);
-  background:#fff;
-  box-shadow:var(--shadow);
-  padding:14px;
-  cursor:pointer;
-}
-
-.socHead{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-}
-
-.socTitle{
-  font-weight:1000;
-  font-size:16px;
-}
-
-.socMeta, .socStats{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-  margin-top:10px;
-}
-
-.socHint{
-  margin-top:10px;
-  font-size:12px;
-  color:var(--muted);
-  font-weight:900;
-}
-
-.socActive{ border-color:#bfead0; background:#f4fff8; }
-.socClosed{ border-color:#e5e5e5; background:#fafafa; }
-.socNew{ border-color:#ffd0e3; background:#fff5fa; }
-
-@media (max-width: 900px){
-  .monthsGrid{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
-
-@media (max-width: 600px){
-  .monthsGrid{ grid-template-columns: repeat(1, minmax(0, 1fr)); }
+.admin-theme .top{
+  background: linear-gradient(90deg, #2aa79a, #2e8fb0);
 }
