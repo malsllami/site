@@ -1,3 +1,4 @@
+<!-- site/admin.html , انسخه واستبدله بالكامل -->
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -8,24 +9,20 @@
 </head>
 <body class="admin-theme">
   <div class="top">
-    <div class="row topRow">
-      <div class="nav rightNav" id="navRight">
-        <a href="index.html" id="navHome">الرئيسية</a>
-        <a href="admin.html" id="navRole" style="display:none">شاشة المدير</a>
+    <div class="row">
+      <div class="nav">
+        <a href="index.html" id="navHome">الشاشة الرئيسية</a>
+        <a href="register.html" id="navRegister">شاشة التسجيل</a>
       </div>
 
-      <div class="brand" id="brandName">جمعية عائلية</div>
+      <div class="brand">جمعية عائلية</div>
 
-      <div class="nav leftNav" id="navLeft">
-        <a href="register.html" id="navLogin">تسجيل الدخول</a>
+      <div class="nav">
+        <a href="member.html" id="navMember">شاشة المشتركين</a>
+        <a href="admin.html" id="navAdmin">شاشة المدير</a>
         <a href="#" id="navLogout" style="display:none">خروج</a>
-        <a href="contact.html" id="navContact">التواصل</a>
       </div>
-
-      <button class="menuBtn" id="menuBtn" aria-label="menu" type="button">≡</button>
     </div>
-
-    <div class="mobileMenu" id="mobileMenu" style="display:none"></div>
   </div>
 
   <div class="container">
@@ -81,16 +78,30 @@
 
         <div class="card">
           <div class="cardHead">
+            <h3>لوحة العرض</h3>
+            <div class="muted">الجمعيات تظهر اولا, المشتركين يظهرون عند الضغط على زر المشتركين</div>
+          </div>
+
+          <div class="tabs mt12">
+            <button class="tab active" onclick="switchDashboardTab('societies', event)">الجمعيات</button>
+            <button class="tab" onclick="switchDashboardTab('members', event)">المشتركين</button>
+          </div>
+        </div>
+
+        <div class="card" id="dash-societies">
+          <div class="cardHead">
             <h3>الجمعيات</h3>
             <div class="muted">اضغط فتح لعرض تفاصيل الجمعية داخل لوحة المدير</div>
           </div>
           <div class="grid" id="societiesAdmin"></div>
         </div>
 
-        <!-- المشتركين لا يظهرون هنا, يظهرون فقط عند الضغط على تبويب المشتركين داخل لوحة الجمعية -->
-        <div class="card" style="display:none">
-          <h3>المشتركين</h3>
-          <div id="members"></div>
+        <div class="card" id="dash-members" style="display:none">
+          <div class="cardHead">
+            <h3>المشتركين</h3>
+            <div class="muted">عرض كبطاقات</div>
+          </div>
+          <div class="grid" id="membersCards"></div>
         </div>
 
       </div>
@@ -112,7 +123,7 @@
             <button class="tab active" onclick="switchTab('months', event)">بطاقات الأشهر</button>
             <button class="tab" onclick="switchTab('collection', event)">التحصيل</button>
             <button class="tab" onclick="switchTab('delivery', event)">التسليم</button>
-            <button class="tab" onclick="switchTab('members', event)">المشتركين</button>
+            <button class="tab" onclick="switchTab('members', event)">الأعضاء</button>
             <button class="tab" onclick="switchTab('changes', event)">التغييرات</button>
           </div>
         </div>
@@ -130,27 +141,27 @@
         <div class="card" id="tab-collection" style="display:none">
           <div class="cardHead">
             <h3>التحصيل</h3>
-            <div class="muted">سيتم بناء بطاقات التحصيل لكل شهر هنا</div>
+            <div class="muted">كل شهر بطاقة, وتحتها جميع المشتركين, التشيك يحفظ مباشرة</div>
           </div>
-          <div id="collectionBox"></div>
+          <div id="collectionGrid"></div>
         </div>
 
         <!-- تبويب التسليم -->
         <div class="card" id="tab-delivery" style="display:none">
           <div class="cardHead">
             <h3>التسليم</h3>
-            <div class="muted">سيتم بناء بطاقات التسليم لكل شهر هنا</div>
+            <div class="muted">يظهر فقط من لديه تسليم في هذا الشهر حسب الرغبات</div>
           </div>
-          <div id="deliveryBox"></div>
+          <div id="deliveryGrid"></div>
         </div>
 
-        <!-- تبويب المشتركين -->
+        <!-- تبويب الأعضاء -->
         <div class="card" id="tab-members" style="display:none">
           <div class="cardHead">
-            <h3>المشتركين</h3>
-            <div class="muted">عرض كبطاقات</div>
+            <h3>الأعضاء</h3>
+            <div class="muted">عرض كبطاقات: الاسم, عدد الأسهم, تواريخ الاستلام</div>
           </div>
-          <div id="societyMembersCards"></div>
+          <div class="grid" id="societyMembersCards"></div>
         </div>
 
         <!-- تبويب التغييرات -->
