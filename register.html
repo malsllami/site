@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>شاشة التسجيل</title>
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
@@ -10,12 +10,14 @@
   <div class="top">
     <div class="row">
       <div>
-        <a href="index.html">الشاشة الرئيسية</a>
-        <a href="contact.html">شاشة التواصل</a>
+        <a href="index.html" id="navHome">الرئيسية</a>
       </div>
-      <div style="font-weight:900">جمعية عائلية</div>
+      <div class="brand">جمعية عائلية</div>
       <div>
-        <a href="admin.html">شاشة المدير</a>
+        <a href="register.html" id="navRegister">التسجيل</a>
+        <a href="member.html" id="navMember">صفحتي</a>
+        <a href="admin.html" id="navAdmin">شاشة المدير</a>
+        <a href="#" id="navLogout" style="display:none">خروج</a>
       </div>
     </div>
   </div>
@@ -23,44 +25,41 @@
   <div class="container">
     <div id="msg"></div>
 
-    <div class="grid">
-      <div class="col-6">
-        <div class="card">
-          <h3>مشترك جديد</h3>
-          <input class="input" id="name" placeholder="الاسم">
-          <div style="height:10px"></div>
-          <input class="input" id="mobile" placeholder="رقم الجوال">
-          <div style="height:12px"></div>
-
-          <button class="btn" id="btnRegister" onclick="register()">تسجيل دخول</button>
-
-          <div id="pinBox" class="pinBox" style="display:none">
-            <div class="pinTitle">رمز PIN الخاص بك</div>
-            <div class="pinValue" id="pinValue"></div>
-
-            <div class="warn warn-orange" id="pinWarn">
-              تنبيه, انسخ الرمز واحتفظ به, هذا هو وسيلة دخولك مستقبلا
-            </div>
-
-            <div class="align-end mt12">
-              <button class="btn btn2" id="btnCopyPin" onclick="copyPin()">نسخ الرمز</button>
-            </div>
-
-            <div id="pinCopied" class="warn warn-green" style="display:none;margin-top:10px">
-              تم النسخ بنجاح
-            </div>
-          </div>
-
+    <div class="card">
+      <h3>تسجيل جديد</h3>
+      <div class="grid2">
+        <div>
+          <label>الاسم</label>
+          <input id="name" type="text">
+        </div>
+        <div>
+          <label>رقم الجوال</label>
+          <input id="mobile" type="text">
         </div>
       </div>
-
-      <div class="col-6">
-        <div class="card">
-          <h3>مشترك سابق</h3>
-          <input class="input" id="pin" placeholder="رمز PIN">
-          <div style="height:12px"></div>
-          <button class="btn" id="btnLogin" onclick="login()">دخول</button>
+      <div class="mt12">
+        <button class="btn" id="btnRegister" onclick="register()">تسجيل</button>
+      </div>
+      <div class="pinBox mt12" id="pinBox" style="display:none">
+        <div class="pinTitle">رمز PIN</div>
+        <div class="pinValue" id="pinValue"></div>
+        <div class="warn warn-orange mt8" id="pinWarn">انسخ الرمز واحتفظ به</div>
+        <div class="ok mt8" id="pinCopied" style="display:none">تم النسخ</div>
+        <div class="mt12">
+          <button class="btn btn2" onclick="copyPin()">نسخ</button>
         </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>دخول بالرمز</h3>
+      <label>رمز PIN</label>
+      <input id="pin" type="text">
+      <div class="mt12">
+        <button class="btn" id="btnLogin" onclick="login()">دخول</button>
+      </div>
+      <div class="mt12 warn warn-gray">
+        رمز المدير الافتراضي 111111
       </div>
     </div>
   </div>
@@ -68,6 +67,7 @@
   <script src="assets/js/config.js"></script>
   <script src="assets/js/api.js"></script>
   <script src="assets/js/ui.js"></script>
+  <script src="assets/js/auth_ui.js"></script>
   <script src="assets/js/pages/register.js"></script>
 </body>
 </html>
