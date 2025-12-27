@@ -1,24 +1,26 @@
+<!-- site/admin_member.html , ملف جديد -->
 <!doctype html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>صفحتي</title>
+  <title>إدارة مشترك</title>
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
-<body>
+<body class="admin-theme">
   <div class="top">
     <div class="row">
-      <div>
-        <a href="index.html">الرئيسية</a>
-        <a href="register.html">التسجيل</a>
-      </div>
-      <div class="brand">جمعية عائلية</div>
-      <div>
-        <a href="member.html">صفحتي</a>
-        <a href="admin.html">المدير</a>
+      <button class="hamburger" id="btnMenu" aria-label="القائمة" onclick="toggleMobileMenu()">
+        <span></span><span></span><span></span>
+      </button>
+
+      <div class="nav mobileMenu" id="mobileMenu">
+        <a href="index.html">الشاشة الرئيسية</a>
+        <a href="admin.html">شاشة المدير</a>
         <a href="#" id="navLogout" style="display:none">خروج</a>
       </div>
+
+      <div class="brand">جمعية عائلية</div>
     </div>
   </div>
 
@@ -26,37 +28,81 @@
     <div id="msg"></div>
 
     <div class="card">
-      <h3 id="pageTitle">صفحتي</h3>
-
-      <div id="pinArea" class="pinBox" style="display:none">
-        <div class="pinTitle">رمز PIN</div>
-        <div class="pinValue" id="myPinValue"></div>
-        <div class="align-end mt12">
-          <button class="btn" onclick="copyMyPin()">نسخ PIN</button>
-        </div>
-        <div id="pinStickyWarn" class="warn warn-orange mt12">
-          انسخ الرمز واحفظه للدخول لاحقًا
+      <div class="cardHead">
+        <h3>إدارة مشترك</h3>
+        <div class="align-end">
+          <button class="btn btn2" onclick="location.href='admin.html'">رجوع</button>
         </div>
       </div>
 
-      <div id="info"></div>
+      <div id="memberInfo"></div>
     </div>
 
     <div class="card">
-      <h3>الجمعيات المشترك بها</h3>
-      <div id="mySocieties"></div>
+      <div class="cardHead">
+        <h3>رمز PIN</h3>
+        <div class="muted">يمكنك التعديل والنسخ</div>
+      </div>
+
+      <div class="grid">
+        <div class="col-8">
+          <input class="input" id="pinNew" placeholder="PIN جديد, 6 ارقام مثلا">
+        </div>
+        <div class="col-4">
+          <button class="btn" id="btnSavePin" onclick="savePin()">حفظ</button>
+        </div>
+
+        <div class="col-12">
+          <div class="warn warn-gray">
+            <div class="grid">
+              <div class="col-8">
+                <div class="small">PIN الحالي</div>
+                <div style="font-weight:900;font-size:20px" id="pinCurrent">-</div>
+              </div>
+              <div class="col-4 align-end">
+                <button class="btn btn2" onclick="copyText('pinCurrent')">نسخ</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
 
     <div class="card">
-      <h3>جمعيات متاحة للتسجيل</h3>
-      <div id="availableSocieties"></div>
+      <div class="cardHead">
+        <h3>اشتراكات المشترك</h3>
+        <div class="muted">إدارة الأسهم والرغبات لكل جمعية</div>
+      </div>
+
+      <div id="subsBox"></div>
     </div>
+
+    <!-- محرر الرغبات -->
+    <div class="card" id="prefsCard" style="display:none">
+      <div class="cardHead">
+        <h3 id="prefsTitle">رغبات المشترك</h3>
+        <div class="align-end">
+          <button class="btn btn2" onclick="closePrefs()">إغلاق</button>
+        </div>
+      </div>
+
+      <div id="prefsMeta" class="small"></div>
+      <div id="prefsTable"></div>
+
+      <div id="prefsMsg" class="mt12"></div>
+
+      <div class="align-end mt12">
+        <button class="btn" id="btnSavePrefs" onclick="savePrefs()">حفظ</button>
+      </div>
+    </div>
+
   </div>
 
   <script src="assets/js/config.js"></script>
   <script src="assets/js/api.js"></script>
   <script src="assets/js/ui.js"></script>
   <script src="assets/js/auth_ui.js"></script>
-  <script src="assets/js/pages/member.js"></script>
+  <script src="assets/js/pages/admin_member.js"></script>
 </body>
 </html>
