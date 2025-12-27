@@ -1,4 +1,4 @@
-/* site/assets/css/styles.css , انسخه واستبدله بالكامل */
+/* assets/css/styles.css , انسخه واستبدله بالكامل */
 :root{
   --top:#0e6f7f;
   --bg1:#dfeff2;
@@ -30,6 +30,9 @@ a{ text-decoration:none; color:inherit; }
   color:#fff;
   padding:14px 12px;
   width:100%;
+  position:sticky;
+  top:0;
+  z-index:10;
 }
 
 .top .row{
@@ -108,8 +111,15 @@ button, .btn{
   font-weight:700;
 }
 
+.w100{ width:100%; }
+
 .btn2{
   background:#6c7a86;
+}
+
+button:disabled{
+  opacity:.6;
+  cursor:not-allowed;
 }
 
 button:active{ transform:scale(.99); }
@@ -178,7 +188,7 @@ button:active{ transform:scale(.99); }
 .cellTitle{ font-weight:800; }
 .cellSub{ font-size:12px; color:var(--muted); margin-top:2px; }
 
-/* ===== إضافات الشكل المطلوبة ===== */
+/* إضافات */
 .kv{
   display:flex;
   gap:12px;
@@ -208,24 +218,14 @@ button:active{ transform:scale(.99); }
 
 .pillSmall{
   display:inline-flex;
-  padding:6px 10px;
+  align-items:center;
+  justify-content:center;
+  padding:7px 12px;
   border-radius:999px;
   border:1px solid var(--border);
   background:#fff;
   font-weight:900;
-  font-size:12px;
   color:var(--text);
-}
-
-.labelPill{
-  display:inline-block;
-  padding:7px 10px;
-  border:1px solid var(--border);
-  border-radius:999px;
-  background:#fff;
-  font-weight:900;
-  color:var(--text);
-  font-size:13px;
 }
 
 .pinBox{
@@ -258,7 +258,6 @@ button:active{ transform:scale(.99); }
   padding:14px;
   background:#fff;
   box-shadow:var(--shadow);
-  cursor:pointer;
 }
 
 .socTop{
@@ -268,8 +267,17 @@ button:active{ transform:scale(.99); }
   align-items:center;
 }
 
-.socBody{ margin-top:10px; color:var(--muted); line-height:1.9; }
-.socActions{ margin-top:10px; display:flex; justify-content:flex-end; }
+.socBody{
+  margin-top:10px;
+  color:var(--text);
+  line-height:1.9;
+}
+
+.socActions{
+  display:flex;
+  justify-content:flex-end;
+  margin-top:12px;
+}
 
 /* بادجات الحالة */
 .badge{
@@ -299,109 +307,170 @@ button:active{ transform:scale(.99); }
 /* تبويبات */
 .tabs{
   display:flex;
-  flex-wrap:wrap;
   gap:10px;
+  flex-wrap:wrap;
 }
+
 .tab{
-  border:1px solid var(--border);
   background:#fff;
   color:var(--text);
-  padding:10px 12px;
+  border:1px solid var(--border);
   border-radius:999px;
+  padding:10px 14px;
   font-weight:900;
   cursor:pointer;
 }
+
 .tab.active{
   background:var(--top);
   color:#fff;
   border-color:transparent;
 }
 
-/* بطاقات الأشهر */
-.monthsGrid{
+/* بطاقات المشتركين */
+.memberCard{
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:14px;
+  background:#fff;
+  box-shadow:var(--shadow);
+}
+
+.memberTop{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+
+.memberName{
+  font-weight:900;
+  font-size:18px;
+}
+
+.memberLine{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  padding:10px 0;
+  border-bottom:1px solid #f2f2f2;
+}
+.memberLine:last-of-type{ border-bottom:none; }
+
+.memberActions{
+  display:flex;
+  justify-content:flex-end;
+  margin-top:12px;
+}
+
+/* أيقونات التواصل */
+.iconGrid{
   display:flex;
   flex-wrap:wrap;
   gap:12px;
 }
-.month-card{
-  width:calc(33.333% - 8px);
+
+.iconCard{
+  width:calc(50% - 6px);
   border:1px solid var(--border);
-  border-radius:16px;
+  border-radius:18px;
+  padding:14px;
   background:#fff;
   box-shadow:var(--shadow);
-  padding:14px;
-  position:relative;
-  overflow:hidden;
-}
-.month-card h4{ margin:0 0 10px 0; font-size:18px; }
-.month-card .meta{ color:var(--muted); line-height:1.9; }
-.month-card .stripe{
-  position:absolute;
-  top:0;
-  right:0;
-  width:100%;
-  height:6px;
-  background:#e6f6f8;
-}
-.month-ok .stripe{ background:#e6f6f8; }
-.month-near .stripe{ background:#fff4e5; }
-.month-limit .stripe{ background:#ffeaf3; }
-.month-over .stripe{ background:#ffeaea; }
-.month-done{ filter: grayscale(1); opacity:.85; }
-
-.accordion{
-  margin-top:12px;
-  border-top:1px solid #f0f0f0;
-  padding-top:10px;
-}
-.accRow{
   display:flex;
-  justify-content:space-between;
-  gap:10px;
-  padding:8px 0;
-  border-bottom:1px solid #f2f2f2;
   align-items:center;
+  gap:12px;
+  cursor:pointer;
+  text-align:right;
 }
-.accRow:last-child{ border-bottom:none; }
+
+.iconCard:active{ transform:scale(.99); }
+
+.iconSvg{
+  width:52px;
+  height:52px;
+  border-radius:16px;
+  border:1px solid var(--border);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#fbfbfb;
+}
+
+.iconCard svg{ fill: var(--top); }
+
+.iconTitle{ font-weight:900; }
+.iconSub{ font-size:13px; color:var(--muted); margin-top:3px; }
+
+/* قائمة الجوال */
+.hamburger{
+  display:none;
+  width:44px;
+  height:44px;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.25);
+  background:transparent;
+  align-items:center;
+  justify-content:center;
+  padding:10px;
+}
+
+.hamburger span{
+  display:block;
+  width:18px;
+  height:2px;
+  background:#fff;
+  margin:3px 0;
+  border-radius:4px;
+}
 
 @media (max-width: 900px){
   .container{ width:min(980px, 94vw); }
   .card{ padding:16px; }
   h3{ font-size:18px; }
   .col-4{ width:calc(50% - 6px); }
-  .month-card{ width:calc(50% - 6px); }
+  .iconCard{ width:100%; }
 }
 
 @media (max-width: 600px){
   .container{ width:94vw; }
 
-  .top{ padding:12px 10px; }
+  .top{ padding:10px 10px; }
   .top .row{
-    flex-direction:column;
-    align-items:stretch;
-    gap:8px;
+    flex-direction:row;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
   }
 
   .brand{
-    width:100%;
     text-align:center;
-    font-size:18px;
-  }
-
-  .nav{
-    width:100%;
-    justify-content:space-between;
-  }
-
-  .nav a{
+    font-size:16px;
     flex:1;
-    text-align:center;
-    font-size:14px;
-    padding:10px 10px;
+  }
+
+  .hamburger{ display:inline-flex; }
+
+  .nav.mobileMenu{
+    display:none;
+    width:100%;
+    flex-direction:column;
+    gap:8px;
+    padding-top:8px;
+  }
+
+  .nav.mobileMenu.open{
+    display:flex;
+  }
+
+  .nav.mobileMenu a{
+    width:100%;
+    justify-content:flex-start;
+    background:rgba(255,255,255,.10);
   }
 
   .col-6, .col-4, .col-8{ width:100%; }
-  .month-card{ width:100%; }
 
   .tableWrap{ border:none; background:transparent; }
   .table{ border-collapse:separate; border-spacing:0 12px; }
