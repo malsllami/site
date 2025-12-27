@@ -32,9 +32,7 @@ async function register(){
 
     const data = await post({ action:"تسجيل جديد", الاسم, رقم_الجوال });
 
-     حفظ_جلسة(data.token, data.دور);
-
-
+    حفظ_جلسة(data.token, "مشترك");
 
     _lastPin = String(data.رمز || "").trim();
 
