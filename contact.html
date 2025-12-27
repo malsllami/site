@@ -1,5 +1,6 @@
+<!-- site/contact.html , انسخه واستبدله بالكامل -->
 <!doctype html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,22 +10,94 @@
 <body>
   <div class="top">
     <div class="row">
-      <div>
+      <button class="hamburger" id="btnMenu" aria-label="القائمة" onclick="toggleMobileMenu()">
+        <span></span><span></span><span></span>
+      </button>
+
+      <div class="nav mobileMenu" id="mobileMenu">
         <a href="index.html">الشاشة الرئيسية</a>
         <a href="register.html">شاشة التسجيل</a>
-      </div>
-      <div style="font-weight:900">جمعية عائلية</div>
-      <div>
         <a href="member.html">شاشة المشتركين</a>
+        <a href="admin.html">شاشة المدير</a>
       </div>
+
+      <div class="brand">جمعية عائلية</div>
     </div>
   </div>
 
   <div class="container">
     <div id="msg"></div>
+
     <div class="card">
       <h3>شاشة التواصل</h3>
-      <div>ضع هنا بيانات التواصل</div>
+      <div class="small">اضغط على أيقونة للتواصل مباشرة من الجوال</div>
+
+      <div class="iconGrid mt12">
+
+        <a class="iconCard" href="tel:+966555889581" aria-label="جوال">
+          <div class="iconSvg">
+            <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
+              <path d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm5 18a1 1 0 1 0 0 .01V20zM7 6h10V4H7v2z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="iconTitle">جوال</div>
+            <div class="iconSub">+966555889581</div>
+          </div>
+        </a>
+
+        <a class="iconCard" href="https://wa.me/966555889581" target="_blank" rel="noopener" aria-label="واتساب">
+          <div class="iconSvg">
+            <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
+              <path d="M12 2a10 10 0 0 0-8.66 15l-1.1 4 4.1-1.07A10 10 0 1 0 12 2zm0 18a8 8 0 0 1-4.07-1.1l-.3-.18-2.43.63.65-2.36-.2-.31A8 8 0 1 1 20 12a8 8 0 0 1-8 8zm4.4-5.6c-.24-.12-1.4-.69-1.62-.77-.22-.08-.38-.12-.54.12s-.62.77-.76.93-.28.18-.52.06a6.55 6.55 0 0 1-1.93-1.2 7.2 7.2 0 0 1-1.33-1.65c-.14-.24 0-.37.1-.49l.36-.41c.12-.14.16-.24.24-.4.08-.16.04-.3-.02-.42-.06-.12-.54-1.3-.74-1.78-.2-.48-.4-.41-.54-.42h-.46c-.16 0-.42.06-.64.3-.22.24-.84.82-.84 2 0 1.18.86 2.32.98 2.48.12.16 1.7 2.6 4.12 3.64.58.25 1.03.4 1.38.51.58.18 1.1.15 1.52.09.46-.07 1.4-.57 1.6-1.12.2-.55.2-1.02.14-1.12-.06-.1-.22-.16-.46-.28z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="iconTitle">واتساب</div>
+            <div class="iconSub">نفس رقم الجوال</div>
+          </div>
+        </a>
+
+        <a class="iconCard" href="mailto:malsllami@gmail.com" aria-label="جيميل">
+          <div class="iconSvg">
+            <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
+              <path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4-8 5L4 8V6l8 5 8-5v2z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="iconTitle">جيميل</div>
+            <div class="iconSub">malsllami@gmail.com</div>
+          </div>
+        </a>
+
+        <button class="iconCard" type="button" onclick="toggleBank()" aria-label="بنك الراجحي">
+          <div class="iconSvg">
+            <svg viewBox="0 0 24 24" width="28" height="28" aria-hidden="true">
+              <path d="M12 2 2 7v2h20V7L12 2zm8 9H4v9h3v-7h2v7h3v-7h2v7h3v-7h2v7h1v-9z"/>
+            </svg>
+          </div>
+          <div>
+            <div class="iconTitle">بنك الراجحي</div>
+            <div class="iconSub">اضغط لعرض البيانات</div>
+          </div>
+        </button>
+
+      </div>
+
+      <div id="bankBox" class="mt12" style="display:none">
+        <div class="warn warn-gray">
+          <div class="kv"><div class="k">رقم الحساب</div><div class="v"><b id="accNo">380000010006086006199</b></div></div>
+          <div class="kv"><div class="k">رقم الايبان</div><div class="v"><b id="iban">SA76 8000 0380 6080 1600 6199</b></div></div>
+          <div class="kv"><div class="k">كود سويفت</div><div class="v"><b id="swift">RJHISARI</b></div></div>
+
+          <div class="grid mt12">
+            <div class="col-4"><button class="btn btn2 w100" onclick="copyText('accNo')">نسخ الحساب</button></div>
+            <div class="col-4"><button class="btn btn2 w100" onclick="copyText('iban')">نسخ الايبان</button></div>
+            <div class="col-4"><button class="btn btn2 w100" onclick="copyText('swift')">نسخ السويفت</button></div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 
