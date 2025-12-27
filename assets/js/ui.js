@@ -35,3 +35,8 @@ function badge(state){
   if(s === "مغلقة") return `<span class="badge b3">مغلقة</span>`;
   return `<span class="badge b0">${esc(s)}</span>`;
 }
+
+function q(name){
+  const url = new URL(location.href);
+  return url.searchParams.get(name) || "";
+}
