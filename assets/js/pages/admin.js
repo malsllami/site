@@ -1,4 +1,4 @@
-// assets/js/pages/admin.js  , انسخه واستبدله بالكامل
+// site/assets/js/pages/admin.js  (استبدله بالكامل)
 let adminToken = "";
 let cachedSocieties = [];
 let currentSocietyId = "";
@@ -17,11 +17,10 @@ function fmtNum(n){
 }
 
 function sumArr(arr){
-  return arr.reduce((s,x)=> s + Number(x||0), 0);
+  return arr.reduce((s, x) => s + Number(x || 0), 0);
 }
 
-function calcMonthStatus(monthIndex, monthlyCollection, monthsTotals){
-  // monthsTotals: [{deliveryAmount, available, ratio, surplusEnd}]
+function calcMonthStatus(monthIndex, monthsTotals){
   const row = monthsTotals[monthIndex] || null;
   if(!row) return "month-ok";
 
@@ -36,16 +35,16 @@ function badgeHtml(state){
 }
 
 function switchTab(tab, ev){
-  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
   if(ev && ev.target) ev.target.classList.add("active");
 
   const a = document.getElementById("tab-months");
   const b = document.getElementById("tab-members");
   const c = document.getElementById("tab-changes");
 
-  if(a) a.style.display = (tab==="months") ? "" : "none";
-  if(b) b.style.display = (tab==="members") ? "" : "none";
-  if(c) c.style.display = (tab==="changes") ? "" : "none";
+  if(a) a.style.display = (tab === "months") ? "" : "none";
+  if(b) b.style.display = (tab === "members") ? "" : "none";
+  if(c) c.style.display = (tab === "changes") ? "" : "none";
 }
 
 function backToDashboard(){
@@ -72,7 +71,6 @@ async function adminLogin(){
 
     حفظ_جلسة(data.token, "مدير");
     location.reload();
-
   }catch(e){
     showMsg("err", e.message || String(e));
   }
@@ -119,7 +117,7 @@ function renderSocieties(arr){
     return;
   }
 
-  box.innerHTML = arr.map(s=>{
+  box.innerHTML = arr.map(s => {
     const title = esc(s.اسم || "");
     const id = esc(s.معرف || "");
     const st = esc(s.تاريخ_البداية || "");
@@ -160,7 +158,7 @@ function renderMembers(arr){
     return;
   }
 
-  const rows = arr.map(u=>{
+  const rows = arr.map(u => {
     const الاسم = esc(u.الاسم || "");
     const الجوال = esc(u.رقم_الجوال || "");
     const رمز = esc(u.رمز || "");
@@ -219,21 +217,19 @@ async function createSoc(){
     document.getElementById("socStart").value = "";
 
     await loadAdminData();
-
   }catch(e){
     showMsg("err", e.message || String(e));
   }
 }
 
-function computeMonthsTotals(members, monthlyCollection){
-  // members: [{اشهر:[10 قيم]}]
+function computeMonthsTotals(members, monthlyCollection, deliveryPerShare){
   const months = 10;
   const totals = [];
 
   let surplusPrev = 0;
-  for(let i=0;i<months;i++){
-    const monthShares = members.reduce((s,m)=> s + Number((m.اشهر && m.اشهر[i]) ? m.اشهر[i] : 0), 0);
-    const deliveryAmount = monthShares * 1000;
+  for(let i = 0; i < months; i++){
+    const monthShares = members.reduce((s, m) => s + Number((m.اشهر && m.اشهر[i]) ? m.اشهر[i] : 0), 0);
+    const deliveryAmount = monthShares * deliveryPerShare;
     const available = monthlyCollection + surplusPrev;
     const ratio = (available > 0) ? (deliveryAmount / available) : 0;
     const surplusEnd = available - deliveryAmount;
@@ -249,13 +245,13 @@ function buildMembersTable(members){
     return `<div class="warn warn-gray">لا يوجد أعضاء في هذه الجمعية</div>`;
   }
 
-  const headerMonths = Array.from({length:10}).map((_,i)=> `<th>${i+1}</th>`).join("");
+  const headerMonths = Array.from({ length:10 }).map((_, i) => `<th>${i + 1}</th>`).join("");
 
-  const rows = members.map(m=>{
-    const months = (m.اشهر || []).slice(0,10);
-    const monthTds = Array.from({length:10}).map((_,i)=>{
+  const rows = members.map(m => {
+    const months = (m.اشهر || []).slice(0, 10);
+    const monthTds = Array.from({ length:10 }).map((_, i) => {
       const v = Number(months[i] || 0);
-      return `<td data-label="${i+1}">${v ? `<b>${esc(fmtNum(v))}</b>` : "0"}</td>`;
+      return `<td data-label="${i + 1}">${v ? `<b>${esc(fmtNum(v))}</b>` : "0"}</td>`;
     }).join("");
 
     return `
@@ -290,7 +286,7 @@ function buildChangesTable(changes){
     return `<div class="warn warn-gray">لا توجد تغييرات</div>`;
   }
 
-  const rows = changes.map(x=>{
+  const rows = changes.map(x => {
     return `
       <tr>
         <td data-label="الاسم"><b>${esc(x.الاسم || "")}</b></td>
@@ -320,13 +316,13 @@ function buildChangesTable(changes){
   `;
 }
 
-function buildMonthsCards(members, monthlyCollection, monthsTotals){
+function buildMonthsCards(members, monthsTotals){
   const months = 10;
-
   const cards = [];
-  for(let i=0;i<months;i++){
+
+  for(let i = 0; i < months; i++){
     const row = monthsTotals[i];
-    const status = calcMonthStatus(i, monthlyCollection, monthsTotals);
+    const status = calcMonthStatus(i, monthsTotals);
 
     const monthNo = i + 1;
     const totalShares = row ? row.monthShares : 0;
@@ -355,13 +351,12 @@ function buildMonthsCards(members, monthlyCollection, monthsTotals){
       const acc = document.createElement("div");
       acc.className = "accordion";
 
-      // تفاصيل المشتركين لهذا الشهر فقط
-      members.forEach(m=>{
+      members.forEach(m => {
         const v = Number((m.اشهر && m.اشهر[i]) ? m.اشهر[i] : 0);
         if(v <= 0) return;
 
         const total = Number(m.عدد_الاسهم || 0);
-        const usedTill = sumArr((m.اشهر || []).slice(0, i+1));
+        const usedTill = sumArr((m.اشهر || []).slice(0, i + 1));
         const remaining = total - usedTill;
 
         acc.innerHTML += `
@@ -397,11 +392,11 @@ async function openSociety(id){
     const members = data.اعضاء || [];
     const changes = data.تغييرات || [];
 
-    // عنوان وميتا
     const title = `${soc.اسم || "جمعية"}  ${badgeHtml(soc.حالة)}`;
     document.getElementById("societyTitle").innerHTML = title;
 
-    const monthlyCollection = Number(soc.عدد_الاسهم || 0) * 100;
+    const monthlyCollection = Number(soc.عدد_الاسهم || 0) * Number(soc.قيمة_السهم_الشهري || 100);
+    const deliveryPerShare = Number(soc.قيمة_تسليم_السهم || 1000);
 
     document.getElementById("societyMeta").innerHTML = `
       <div class="grid">
@@ -413,23 +408,19 @@ async function openSociety(id){
       </div>
     `;
 
-    // بناء البطاقات
-    const monthsTotals = computeMonthsTotals(members, monthlyCollection);
+    const monthsTotals = computeMonthsTotals(members, monthlyCollection, deliveryPerShare);
     const monthsGrid = document.getElementById("monthsGrid");
     monthsGrid.innerHTML = "";
-    const cards = buildMonthsCards(members, monthlyCollection, monthsTotals);
-    cards.forEach(c=> monthsGrid.appendChild(c));
+    const cards = buildMonthsCards(members, monthsTotals);
+    cards.forEach(c => monthsGrid.appendChild(c));
 
-    // الجداول
     document.getElementById("societyMembersTable").innerHTML = buildMembersTable(members);
     document.getElementById("societyChangesTable").innerHTML = buildChangesTable(changes);
 
-    // اظهار قسم الجمعية
     hide(document.getElementById("dashboard"));
     show(document.getElementById("societyView"));
 
-    // افتراضي على بطاقات الأشهر
-    document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
     const firstTab = document.querySelector(".tab");
     if(firstTab) firstTab.classList.add("active");
     switchTab("months", null);
