@@ -1,8 +1,6 @@
-// assets/js/pages/admin.js , انسخه واستبدله بالكامل
 let adminToken = "";
 let cachedSocieties = [];
 let currentSocietyId = "";
-let cachedMembers = [];
 
 function showMsg(type, text){
   msg(type, text);
@@ -39,26 +37,17 @@ function switchTab(tab, ev){
   document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
   if(ev && ev.target) ev.target.classList.add("active");
 
-  const a = document.getElementById("tab-months");
-  const b = document.getElementById("tab-members");
-  const c = document.getElementById("tab-changes");
+  const months = document.getElementById("tab-months");
+  const collection = document.getElementById("tab-collection");
+  const delivery = document.getElementById("tab-delivery");
+  const members = document.getElementById("tab-members");
+  const changes = document.getElementById("tab-changes");
 
-  if(a) a.style.display = (tab==="months") ? "" : "none";
-  if(b) b.style.display = (tab==="members") ? "" : "none";
-  if(c) c.style.display = (tab==="changes") ? "" : "none";
-}
-
-function switchDash(which, ev){
-  document.querySelectorAll("#dashboard .tab").forEach(t=>t.classList.remove("active"));
-  if(ev && ev.target) ev.target.classList.add("active");
-
-  const a = document.getElementById("dash-societies");
-  const b = document.getElementById("dash-members");
-
-  if(a) a.style.display = (which==="societies") ? "" : "none";
-  if(b) b.style.display = (which==="members") ? "" : "none";
-
-  showMsg("", "");
+  if(months) months.style.display = (tab==="months") ? "" : "none";
+  if(collection) collection.style.display = (tab==="collection") ? "" : "none";
+  if(delivery) delivery.style.display = (tab==="delivery") ? "" : "none";
+  if(members) members.style.display = (tab==="members") ? "" : "none";
+  if(changes) changes.style.display = (tab==="changes") ? "" : "none";
 }
 
 function backToDashboard(){
@@ -83,7 +72,7 @@ async function adminLogin(){
       return;
     }
 
-    حفظ_جلسة(data.token, "مدير");
+    حفظ_جلسة(data.token, "مدير", data.الاسم || "");
     location.reload();
 
   }catch(e){
@@ -116,11 +105,7 @@ async function loadAdminData(){
   try{
     const data = await get("معلومات مدير", { token: adminToken });
     cachedSocieties = data.جمعيات || [];
-    cachedMembers = data.مشتركين || [];
-
     renderSocieties(cachedSocieties);
-    renderMembersCards(cachedMembers);
-
   }catch(e){
     showMsg("err", e.message || String(e));
   }
@@ -147,71 +132,24 @@ function renderSocieties(arr){
     return `
       <div class="col-4">
         <div class="soc">
-          <div class="socTop">
+          <div class="socTop" style="display:flex;justify-content:space-between;align-items:center;gap:10px">
             <div style="font-weight:900">${title}</div>
             ${badgeHtml(s.حالة)}
           </div>
-          <div class="socBody">
+          <div class="socBody" style="margin-top:10px;color:#6c7a86;font-weight:800;line-height:1.9">
             <div>تاريخ البداية ${st}</div>
             <div>تاريخ النهاية ${en}</div>
             <div>عدد المشتركين ${members}</div>
             <div>عدد الاسهم ${shares}</div>
             <div>قيمة الجمعية الاجمالي ${total}</div>
           </div>
-          <div class="socActions">
+          <div class="socActions" style="margin-top:12px;display:flex;justify-content:flex-end">
             <button class="btn" onclick="openSociety('${id}')">فتح</button>
           </div>
         </div>
       </div>
     `;
   }).join("");
-}
-
-function renderMembersCards(arr){
-  const box = document.getElementById("membersCards");
-  if(!box) return;
-
-  if(!arr.length){
-    box.innerHTML = `<div class="col-12"><div class="warn warn-gray">لا يوجد مشتركين</div></div>`;
-    return;
-  }
-
-  box.innerHTML = arr.map(u=>{
-    const id = esc(u.معرف || u["معرف المستخدم"] || "");
-    const الاسم = esc(u.الاسم || "");
-    const الجوال = esc(u.رقم_الجوال || "");
-    const رمز = esc(u.رمز || "");
-    const حالة = esc(u.حالة || "");
-
-    return `
-      <div class="col-4">
-        <div class="memberCard">
-          <div class="memberTop">
-            <div class="memberName">${الاسم}</div>
-            <span class="pillSmall">${حالة || "نشط"}</span>
-          </div>
-
-          <div class="memberLine">
-            <span class="muted">رقم الجوال</span>
-            <b dir="ltr">${الجوال}</b>
-          </div>
-
-          <div class="memberLine">
-            <span class="muted">PIN</span>
-            <span class="pillSmall" dir="ltr">${رمز}</span>
-          </div>
-
-          <div class="memberActions">
-            <button class="btn btn2" onclick="openMember('${id}')">فتح</button>
-          </div>
-        </div>
-      </div>
-    `;
-  }).join("");
-}
-
-function openMember(uid){
-  location.href = "admin_member.html?معرف=" + encodeURIComponent(uid);
 }
 
 async function createSoc(){
@@ -264,45 +202,41 @@ function computeMonthsTotals(members, monthlyCollection){
   return totals;
 }
 
-function buildMembersTable(members){
+function buildMembersCards(members){
   if(!members.length){
-    return `<div class="warn warn-gray">لا يوجد أعضاء في هذه الجمعية</div>`;
+    return `<div class="warn warn-gray">لا يوجد مشتركين في هذه الجمعية</div>`;
   }
 
-  const headerMonths = Array.from({length:10}).map((_,i)=> `<th>${i+1}</th>`).join("");
-
-  const rows = members.map(m=>{
-    const months = (m.اشهر || []).slice(0,10);
-    const monthTds = Array.from({length:10}).map((_,i)=>{
-      const v = Number(months[i] || 0);
-      return `<td data-label="${i+1}">${v ? `<b>${esc(fmtNum(v))}</b>` : "0"}</td>`;
-    }).join("");
+  const cards = members.map(m=>{
+    const nm = esc(m.الاسم || "");
+    const shares = esc(fmtNum(m.عدد_الاسهم || 0));
+    const lastDelivery = (() => {
+      const arr = (m.اشهر || []).slice(0,10);
+      let last = 0;
+      for(let i=0;i<arr.length;i++){
+        if(Number(arr[i]||0) > 0) last = i+1;
+      }
+      return last ? ("شهر " + last) : "-";
+    })();
 
     return `
-      <tr>
-        <td data-label="الاسم"><b>${esc(m.الاسم || "")}</b></td>
-        <td data-label="عدد الاسهم">${esc(fmtNum(m.عدد_الاسهم || 0))}</td>
-        ${monthTds}
-        <td data-label="الاجمالي"><b>${esc(fmtNum(m.اجمالي || 0))}</b></td>
-      </tr>
+      <div class="mCard">
+        <div class="mTop">
+          <div class="mName">${nm}</div>
+          <div class="badge gray">مشترك</div>
+        </div>
+        <div class="mMeta">
+          <div class="mRow"><span>عدد الأسهم</span><b>${shares}</b></div>
+          <div class="mRow"><span>آخر شهر استلام</span><b>${esc(lastDelivery)}</b></div>
+        </div>
+        <div class="mActions">
+          <button class="btn btn2" onclick="alert('واجهة فتح المشترك سيتم ربطها بالصفحة الجديدة لاحقا')">فتح</button>
+        </div>
+      </div>
     `;
   }).join("");
 
-  return `
-    <div class="tableWrap">
-      <table class="table">
-        <thead>
-          <tr>
-            <th>الاسم</th>
-            <th>عدد الاسهم</th>
-            ${headerMonths}
-            <th>الاجمالي</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-    </div>
-  `;
+  return `<div class="memberCards">${cards}</div>`;
 }
 
 function buildChangesTable(changes){
@@ -342,7 +276,6 @@ function buildChangesTable(changes){
 
 function buildMonthsCards(members, monthlyCollection, monthsTotals){
   const months = 10;
-
   const cards = [];
   for(let i=0;i<months;i++){
     const row = monthsTotals[i];
@@ -437,14 +370,21 @@ async function openSociety(id){
     const cards = buildMonthsCards(members, monthlyCollection, monthsTotals);
     cards.forEach(c=> monthsGrid.appendChild(c));
 
-    document.getElementById("societyMembersTable").innerHTML = buildMembersTable(members);
+    const mCardsBox = document.getElementById("societyMembersCards");
+    if(mCardsBox) mCardsBox.innerHTML = buildMembersCards(members);
+
     document.getElementById("societyChangesTable").innerHTML = buildChangesTable(changes);
+
+    const colBox = document.getElementById("collectionBox");
+    const delBox = document.getElementById("deliveryBox");
+    if(colBox) colBox.innerHTML = `<div class="warn warn-gray">جاهز للمرحلة القادمة, سيتم بناء بطاقات التحصيل هنا</div>`;
+    if(delBox) delBox.innerHTML = `<div class="warn warn-gray">جاهز للمرحلة القادمة, سيتم بناء بطاقات التسليم هنا</div>`;
 
     hide(document.getElementById("dashboard"));
     show(document.getElementById("societyView"));
 
     document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
-    const firstTab = document.querySelector("#societyView .tab");
+    const firstTab = document.querySelector(".tab");
     if(firstTab) firstTab.classList.add("active");
     switchTab("months", null);
 
