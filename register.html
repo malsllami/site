@@ -31,8 +31,26 @@
           <div style="height:10px"></div>
           <input class="input" id="mobile" placeholder="رقم الجوال">
           <div style="height:12px"></div>
-          <button class="btn" onclick="register()">تسجيل دخول</button>
-          <div id="newpin" style="margin-top:10px;font-weight:800"></div>
+
+          <button class="btn" id="btnRegister" onclick="register()">تسجيل دخول</button>
+
+          <div id="pinBox" class="pinBox" style="display:none">
+            <div class="pinTitle">رمز PIN الخاص بك</div>
+            <div class="pinValue" id="pinValue"></div>
+
+            <div class="warn warn-orange" id="pinWarn">
+              تنبيه, انسخ الرمز واحتفظ به, هذا هو وسيلة دخولك مستقبلا
+            </div>
+
+            <div class="align-end mt12">
+              <button class="btn btn2" id="btnCopyPin" onclick="copyPin()">نسخ الرمز</button>
+            </div>
+
+            <div id="pinCopied" class="warn warn-green" style="display:none;margin-top:10px">
+              تم النسخ بنجاح
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -41,7 +59,7 @@
           <h3>مشترك سابق</h3>
           <input class="input" id="pin" placeholder="رمز PIN">
           <div style="height:12px"></div>
-          <button class="btn" onclick="login()">دخول</button>
+          <button class="btn" id="btnLogin" onclick="login()">دخول</button>
         </div>
       </div>
     </div>
