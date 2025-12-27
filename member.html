@@ -1,52 +1,63 @@
-<div class="container">
-
-  <div id="msg"></div>
-
-  <!-- بيانات المشترك -->
-  <div class="card">
-    <h3>بيانات المشترك</h3>
-    <div id="memberInfo"></div>
+<!-- member.html , انسخه واستبدله بالكامل -->
+<!doctype html>
+<html lang="ar">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>صفحتي</title>
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <div class="top">
+    <div class="row">
+      <div>
+        <a href="index.html" id="navHome">الشاشة الرئيسية</a>
+        <a href="register.html" id="navRegister">شاشة التسجيل</a>
+      </div>
+      <div class="brand">جمعية عائلية</div>
+      <div>
+        <a href="member.html" id="navMember">صفحتي</a>
+        <a href="admin.html" id="navAdmin">شاشة المدير</a>
+        <a href="#" id="navLogout" style="display:none">خروج</a>
+      </div>
+    </div>
   </div>
 
-  <!-- الجمعيات -->
-  <div class="card">
-    <h3>الجمعيات</h3>
-    <div id="societiesList"></div>
-  </div>
-
-  <!-- صفحة الجمعية -->
-  <div id="societyPage" style="display:none">
+  <div class="container">
+    <div id="msg"></div>
 
     <div class="card">
-      <h3 id="socTitle"></h3>
-      <div id="socMeta"></div>
-    </div>
+      <h3 id="pageTitle">صفحتي</h3>
 
-    <!-- الخطوة 1: عدد الأسهم -->
-    <div class="card" id="stepShares">
-      <h3>الخطوة 1: تحديد عدد الأسهم</h3>
-      <div class="field">
-        <input type="number" id="sharesInput" min="0.5" step="0.5" class="input">
+      <div id="pinArea" class="pinBox" style="display:none">
+        <div class="pinTitle">رمز PIN للدخول</div>
+        <div class="pinValue" id="myPinValue"></div>
+        <div id="pinWarn" class="warn warn-orange mt12">
+          انسخ الرمز واحتفظ به , لن تستطيع الدخول بدونه
+        </div>
+        <div class="align-end mt12">
+          <button class="btn" onclick="copyMyPin()">نسخ PIN</button>
+        </div>
       </div>
-      <button class="btn" onclick="saveShares()">حفظ عدد الأسهم</button>
+
+      <div id="info"></div>
     </div>
 
-    <!-- الخطوة 2: الرغبات -->
-    <div class="card" id="stepPrefs" style="display:none">
-      <h3>الخطوة 2: اختيار رغبات الاستلام</h3>
-      <div id="prefsForm"></div>
-      <button class="btn" onclick="savePrefs()">حفظ الرغبات</button>
+    <div class="card">
+      <h3>الجمعيات المشترك بها</h3>
+      <div id="mySocieties"></div>
     </div>
 
-    <!-- ملخص -->
-    <div class="card" id="prefsSummary" style="display:none">
-      <h3>ملخص الرغبات</h3>
-      <div id="prefsSummaryBody"></div>
-      <button class="btn btn2" onclick="editShares()">تعديل عدد الأسهم</button>
-      <button class="btn" onclick="editPrefs()">تعديل الرغبات</button>
+    <div class="card">
+      <h3>جمعيات جديدة متاحة</h3>
+      <div id="availableSocieties"></div>
     </div>
-
-    <button class="btn btn2 mt12" onclick="backToSocieties()">رجوع</button>
   </div>
 
-</div>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/api.js"></script>
+  <script src="assets/js/ui.js"></script>
+  <script src="assets/js/auth_ui.js"></script>
+  <script src="assets/js/pages/member.js"></script>
+</body>
+</html>
