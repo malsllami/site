@@ -40,12 +40,15 @@
       <div class="mt12">
         <button class="btn" id="btnRegister" onclick="register()">تسجيل</button>
       </div>
-      <div class="pinBox mt12" id="pinBox" style="display:none">
-        <div class="pinTitle">رمز PIN</div>
-        <div class="pinValue" id="pinValue"></div>
-        <div class="warn warn-orange mt8" id="pinWarn">انسخ الرمز واحتفظ به</div>
-        <div class="ok mt8" id="pinCopied" style="display:none">تم النسخ</div>
-        <div class="mt12">
+
+      <div class="mt12" id="pinBox" style="display:none">
+        <div class="warn warn-orange" id="pinWarn">انسخ رمز PIN واحتفظ به</div>
+        <div class="kv">
+          <div class="k">رمز PIN</div>
+          <div class="v" id="pinValue"></div>
+        </div>
+        <div class="ok" id="pinCopied" style="display:none">تم النسخ</div>
+        <div class="align-end mt12">
           <button class="btn btn2" onclick="copyPin()">نسخ</button>
         </div>
       </div>
