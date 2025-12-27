@@ -1,4 +1,4 @@
-/* assets/css/styles.css , انسخ هذا الملف كامل واستبدله بالكامل */
+/* site/assets/css/styles.css , انسخه واستبدله بالكامل */
 :root{
   --top:#0e6f7f;
   --bg1:#dfeff2;
@@ -56,14 +56,13 @@ a{ text-decoration:none; color:inherit; }
 .nav a{
   color:#fff;
   padding:8px 12px;
-  border-radius:999px;
+  border-radius:12px;
   transition:all .2s ease;
   opacity:.95;
   white-space:nowrap;
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  border:1px solid rgba(255,255,255,.18);
 }
 
 .nav a:hover{ background:rgba(255,255,255,.12); opacity:1; }
@@ -104,7 +103,7 @@ button, .btn{
   border:none;
   color:#fff;
   padding:10px 16px;
-  border-radius:999px;
+  border-radius:14px;
   cursor:pointer;
   font-weight:700;
 }
@@ -119,7 +118,7 @@ button:active{ transform:scale(.99); }
   width:100%;
   padding:10px 12px;
   border:1px solid var(--border);
-  border-radius:999px;
+  border-radius:14px;
   font-size:15px;
   outline:none;
   background:#fff;
@@ -137,7 +136,7 @@ button:active{ transform:scale(.99); }
 }
 
 .warn{
-  border-radius:16px;
+  border-radius:14px;
   padding:10px 12px;
   margin:8px 0;
   font-size:14px;
@@ -209,22 +208,31 @@ button:active{ transform:scale(.99); }
 
 .pillSmall{
   display:inline-flex;
-  align-items:center;
-  justify-content:center;
   padding:6px 10px;
   border-radius:999px;
   border:1px solid var(--border);
   background:#fff;
-  font-size:13px;
+  font-weight:900;
+  font-size:12px;
+  color:var(--text);
+}
+
+.labelPill{
+  display:inline-block;
+  padding:7px 10px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  background:#fff;
   font-weight:900;
   color:var(--text);
+  font-size:13px;
 }
 
 .pinBox{
   margin-top:12px;
   border:1px solid #cfe8ed;
   background:#f3fbfc;
-  border-radius:18px;
+  border-radius:16px;
   padding:14px;
 }
 .pinTitle{
@@ -237,7 +245,7 @@ button:active{ transform:scale(.99); }
   font-weight:900;
   letter-spacing:1px;
   padding:10px 12px;
-  border-radius:16px;
+  border-radius:14px;
   border:1px dashed #9fd0d8;
   background:#fff;
   display:inline-block;
@@ -246,12 +254,22 @@ button:active{ transform:scale(.99); }
 /* بطاقات الجمعيات */
 .soc{
   border:1px solid var(--border);
-  border-radius:18px;
+  border-radius:16px;
   padding:14px;
   background:#fff;
   box-shadow:var(--shadow);
   cursor:pointer;
 }
+
+.socTop{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:center;
+}
+
+.socBody{ margin-top:10px; color:var(--muted); line-height:1.9; }
+.socActions{ margin-top:10px; display:flex; justify-content:flex-end; }
 
 /* بادجات الحالة */
 .badge{
@@ -278,74 +296,80 @@ button:active{ transform:scale(.99); }
 .col-6{ width:calc(50% - 6px); }
 .col-4{ width:calc(33.333% - 8px); }
 
-/* قائمة الجمعيات في صفحة المشترك */
-.listItem{
+/* تبويبات */
+.tabs{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+.tab{
   border:1px solid var(--border);
-  border-radius:18px;
+  background:#fff;
+  color:var(--text);
+  padding:10px 12px;
+  border-radius:999px;
+  font-weight:900;
+  cursor:pointer;
+}
+.tab.active{
+  background:var(--top);
+  color:#fff;
+  border-color:transparent;
+}
+
+/* بطاقات الأشهر */
+.monthsGrid{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+}
+.month-card{
+  width:calc(33.333% - 8px);
+  border:1px solid var(--border);
+  border-radius:16px;
   background:#fff;
   box-shadow:var(--shadow);
   padding:14px;
-  margin:12px 0;
+  position:relative;
+  overflow:hidden;
 }
+.month-card h4{ margin:0 0 10px 0; font-size:18px; }
+.month-card .meta{ color:var(--muted); line-height:1.9; }
+.month-card .stripe{
+  position:absolute;
+  top:0;
+  right:0;
+  width:100%;
+  height:6px;
+  background:#e6f6f8;
+}
+.month-ok .stripe{ background:#e6f6f8; }
+.month-near .stripe{ background:#fff4e5; }
+.month-limit .stripe{ background:#ffeaf3; }
+.month-over .stripe{ background:#ffeaea; }
+.month-done{ filter: grayscale(1); opacity:.85; }
 
-.listTop{
+.accordion{
+  margin-top:12px;
+  border-top:1px solid #f0f0f0;
+  padding-top:10px;
+}
+.accRow{
   display:flex;
-  align-items:center;
   justify-content:space-between;
   gap:10px;
+  padding:8px 0;
+  border-bottom:1px solid #f2f2f2;
+  align-items:center;
 }
-
-.listTitle{
-  font-weight:900;
-}
-
-.listMeta{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  margin-top:10px;
-}
-
-.listActions{
-  display:flex;
-  justify-content:flex-end;
-  gap:10px;
-  margin-top:12px;
-  flex-wrap:wrap;
-}
-
-/* بطاقات رغباته */
-.prefCards{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  margin-top:12px;
-}
-
-.prefCard{
-  border:1px solid var(--border);
-  border-radius:18px;
-  background:#fbfeff;
-  padding:10px 12px;
-  min-width:140px;
-}
-
-.prefMonth{
-  font-weight:900;
-  color:var(--text);
-}
-
-.prefShares{
-  margin-top:6px;
-  font-weight:900;
-  color:var(--top);
-}
+.accRow:last-child{ border-bottom:none; }
 
 @media (max-width: 900px){
   .container{ width:min(980px, 94vw); }
   .card{ padding:16px; }
   h3{ font-size:18px; }
   .col-4{ width:calc(50% - 6px); }
+  .month-card{ width:calc(50% - 6px); }
 }
 
 @media (max-width: 600px){
@@ -377,6 +401,7 @@ button:active{ transform:scale(.99); }
   }
 
   .col-6, .col-4, .col-8{ width:100%; }
+  .month-card{ width:100%; }
 
   .tableWrap{ border:none; background:transparent; }
   .table{ border-collapse:separate; border-spacing:0 12px; }
@@ -386,7 +411,7 @@ button:active{ transform:scale(.99); }
     display:block;
     background:#fff;
     border:1px solid var(--border);
-    border-radius:18px;
+    border-radius:16px;
     box-shadow:var(--shadow);
     padding:10px 12px;
   }
@@ -411,6 +436,4 @@ button:active{ transform:scale(.99); }
   }
 
   .cellSub{ display:none; }
-
-  .prefCard{ width:100%; }
 }
