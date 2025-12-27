@@ -78,18 +78,30 @@
 
         <div class="card">
           <div class="cardHead">
+            <h3>لوحة العرض</h3>
+            <div class="muted">الجمعيات تظهر اولا, المشتركين يظهرون عند الضغط على زر المشتركين</div>
+          </div>
+
+          <div class="tabs mt12">
+            <button class="tab active" onclick="switchDashboardTab('societies', event)">الجمعيات</button>
+            <button class="tab" onclick="switchDashboardTab('members', event)">المشتركين</button>
+          </div>
+        </div>
+
+        <div class="card" id="dash-societies">
+          <div class="cardHead">
             <h3>الجمعيات</h3>
             <div class="muted">اضغط فتح لعرض تفاصيل الجمعية داخل لوحة المدير</div>
           </div>
           <div class="grid" id="societiesAdmin"></div>
         </div>
 
-        <div class="card">
+        <div class="card" id="dash-members" style="display:none">
           <div class="cardHead">
             <h3>المشتركين</h3>
-            <div class="muted">عرض فقط في هذه المرحلة</div>
+            <div class="muted">عرض كبطاقات</div>
           </div>
-          <div id="members"></div>
+          <div class="grid" id="membersCards"></div>
         </div>
 
       </div>
@@ -111,7 +123,7 @@
             <button class="tab active" onclick="switchTab('months', event)">بطاقات الأشهر</button>
             <button class="tab" onclick="switchTab('collection', event)">التحصيل</button>
             <button class="tab" onclick="switchTab('delivery', event)">التسليم</button>
-            <button class="tab" onclick="switchTab('members', event)">جدول الأعضاء</button>
+            <button class="tab" onclick="switchTab('members', event)">الأعضاء</button>
             <button class="tab" onclick="switchTab('changes', event)">التغييرات</button>
           </div>
         </div>
@@ -129,27 +141,27 @@
         <div class="card" id="tab-collection" style="display:none">
           <div class="cardHead">
             <h3>التحصيل</h3>
-            <div class="muted">كل شهر بطاقة, وكل مشترك سطر, وتفعيل تم التحصيل يسجل في جدول التحصيل</div>
+            <div class="muted">كل شهر بطاقة, وتحتها جميع المشتركين, التشيك يحفظ مباشرة</div>
           </div>
-          <div id="collectionGrid" class="monthsGrid"></div>
+          <div id="collectionGrid"></div>
         </div>
 
         <!-- تبويب التسليم -->
         <div class="card" id="tab-delivery" style="display:none">
           <div class="cardHead">
             <h3>التسليم</h3>
-            <div class="muted">يعرض فقط المشتركين اللي لهم رغبات في هذا الشهر</div>
+            <div class="muted">يظهر فقط من لديه تسليم في هذا الشهر حسب الرغبات</div>
           </div>
-          <div id="deliveryGrid" class="monthsGrid"></div>
+          <div id="deliveryGrid"></div>
         </div>
 
-        <!-- تبويب جدول الأعضاء -->
+        <!-- تبويب الأعضاء -->
         <div class="card" id="tab-members" style="display:none">
           <div class="cardHead">
-            <h3>الأعضاء وتوزيع الأسهم 1 الى 10</h3>
-            <div class="muted">عرض فقط</div>
+            <h3>الأعضاء</h3>
+            <div class="muted">عرض كبطاقات: الاسم, عدد الأسهم, تواريخ الاستلام</div>
           </div>
-          <div id="societyMembersTable"></div>
+          <div class="grid" id="societyMembersCards"></div>
         </div>
 
         <!-- تبويب التغييرات -->
