@@ -7,20 +7,24 @@
   }
 })();
 
-let _busyRegister = false;
-let _busyLogin = false;
+let _regBusy = false;
+let _loginBusy = false;
+let _lastPin = "";
 
-function disableAllButtons(disabled){
-  const btns = document.querySelectorAll("button");
-  btns.forEach(b => { b.disabled = !!disabled; });
+function disable(el, on){
+  const e = document.getElementById(el);
+  if(!e) return;
+  e.disabled = !!on;
+  e.style.opacity = on ? "0.7" : "1";
+  e.style.pointerEvents = on ? "none" : "auto";
 }
 
 async function register(){
-  if(_busyRegister) return;
-  _busyRegister = true;
+  if(_regBusy) return;
+  _regBusy = true;
 
   msg("", "");
-  disableAllButtons(true);
+  disable("btnRegister", true);
 
   try{
     const الاسم = document.getElementById("name").value.trim();
@@ -30,25 +34,57 @@ async function register(){
 
     حفظ_جلسة(data.token, "مشترك");
 
-    document.getElementById("newpin").innerHTML =
-      "رمز PIN الخاص بك هو " + "<span style='color:#a11757'>" + esc(data.رمز) + "</span>";
+    _lastPin = String(data.رمز || "").trim();
 
-    msg("ok", "تم التسجيل بنجاح");
-    setTimeout(()=>location.href="member.html", 700);
+    const box = document.getElementById("pinBox");
+    const v = document.getElementById("pinValue");
+    const copied = document.getElementById("pinCopied");
+    const warn = document.getElementById("pinWarn");
+
+    if(box) box.style.display = "";
+    if(v) v.textContent = _lastPin;
+    if(copied) copied.style.display = "none";
+    if(warn) warn.style.display = "";
+
+    msg("ok", "تم التسجيل بنجاح, انسخ رمز PIN قبل الانتقال");
 
   }catch(e){
-    msg("err", e.message || String(e));
-    disableAllButtons(false);
-    _busyRegister = false;
+    msg("err", e.message);
+  }finally{
+    disable("btnRegister", false);
+    _regBusy = false;
   }
 }
 
+async function copyPin(){
+  if(!_lastPin) return;
+
+  try{
+    await navigator.clipboard.writeText(_lastPin);
+  }catch(e){
+    const t = document.createElement("textarea");
+    t.value = _lastPin;
+    document.body.appendChild(t);
+    t.select();
+    try{ document.execCommand("copy"); }catch(_e){}
+    t.remove();
+  }
+
+  const copied = document.getElementById("pinCopied");
+  const warn = document.getElementById("pinWarn");
+  if(copied) copied.style.display = "";
+  if(warn) warn.style.display = "none";
+
+  msg("ok", "تم نسخ الرمز, سيتم نقلك لصفحتك");
+  setTimeout(()=>location.href="member.html", 700);
+}
+
 async function login(){
-  if(_busyLogin) return;
-  _busyLogin = true;
+  if(_loginBusy) return;
+  _loginBusy = true;
 
   msg("", "");
-  disableAllButtons(true);
+  disable("btnLogin", true);
 
   try{
     const رمز = document.getElementById("pin").value.trim();
@@ -56,10 +92,10 @@ async function login(){
 
     حفظ_جلسة(data.token, data.دور);
     location.href = (data.دور==="مدير") ? "admin.html" : "member.html";
-
   }catch(e){
-    msg("err", e.message || String(e));
-    disableAllButtons(false);
-    _busyLogin = false;
+    msg("err", e.message);
+  }finally{
+    disable("btnLogin", false);
+    _loginBusy = false;
   }
 }
