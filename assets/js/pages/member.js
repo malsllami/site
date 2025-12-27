@@ -1,177 +1,135 @@
-let userToken = "";
-let currentSocietyId = "";
-let currentSociety = null;
-let currentPrefs = null;
-let currentShares = 0;
-let monthsKeys = [];
+// site/assets/js/pages/member.js  (استبدله بالكامل)
+(async function(){
+  document.title = "صفحتي";
 
-function show(el){ el.style.display = ""; }
-function hide(el){ el.style.display = "none"; }
-
-function showMsg(type, text){ msg(type, text); }
-
-async function bootstrap(){
   const s = جلسة();
-  if(!s || !s.token){
-    location.href = "index.html";
-    return;
-  }
-  userToken = s.token;
-
-  await loadMemberInfo();
-  await loadSocieties();
-}
-
-async function loadMemberInfo(){
-  const data = await get("معلومات مشترك", { token: userToken });
-  const u = data.مستخدم;
-  document.getElementById("memberInfo").innerHTML = `
-    <div><b>الاسم:</b> ${esc(u.الاسم)}</div>
-    <div><b>رقم الجوال:</b> ${esc(u.رقم_الجوال)}</div>
-  `;
-}
-
-async function loadSocieties(){
-  const data = await get("جمعيات المشترك", { token: userToken });
-  const box = document.getElementById("societiesList");
-
-  if(!data.اشتراكات.length){
-    box.innerHTML = `<div class="warn warn-gray">لا توجد جمعيات</div>`;
+  if(!s.token || s.role !== "مشترك"){
+    location.href = "register.html";
     return;
   }
 
-  box.innerHTML = data.اشتراكات.map(s=>`
-    <div class="soc">
-      <div><b>${esc(s.اسم_الجمعية)}</b></div>
-      <div>الحالة ${esc(s.حالة)}</div>
-      <div>عدد الأسهم ${esc(s.عدد_الاسهم)}</div>
-      <button class="btn mt8" onclick="openSociety('${esc(s.معرف_الجمعية)}')">فتح</button>
-    </div>
-  `).join("");
-}
+  try{
+    const data = await get("معلومات مشترك", { token: s.token });
+    const u = data.مستخدم;
 
-async function openSociety(id){
-  currentSocietyId = id;
+    setHtml("info",
+      `<div class="kv">
+        <div class="k">الاسم</div><div class="v">${esc(u.الاسم)}</div>
+      </div>
+      <div class="kv">
+        <div class="k">رقم الجوال</div><div class="v">${esc(u.رقم_الجوال)}</div>
+      </div>`
+    );
 
-  const data = await get("رغبات حالة", {
-    token: userToken,
-    معرف_الجمعية: id
-  });
+    const data2 = await get("جمعيات المشترك", { token: s.token });
+    const arr = data2.اشتراكات || [];
 
-  currentSociety = data.جمعية;
-  currentPrefs = data.رغبات;
-  currentShares = Number(data.عدد_اسهم_المشترك || 0);
-  monthsKeys = data.الاشهر || [];
+    const subscribedIds = new Set(arr.map(x => String(x.معرف_الجمعية || "")));
 
-  hide(document.getElementById("societiesList"));
-  show(document.getElementById("societyPage"));
+    if(!arr.length){
+      setHtml("mySocieties", "<div class='warn warn-gray'>لا توجد جمعيات مشترك بها</div>");
+    }else{
+      setHtml("mySocieties", `
+        <div class="tableWrap">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>اسم الجمعية</th>
+                <th>الحالة</th>
+                <th>عدد الاسهم</th>
+                <th>بداية</th>
+                <th>نهاية</th>
+                <th>فتح</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${arr.map(x => `
+                <tr>
+                  <td data-label="اسم الجمعية">${esc(x.اسم_الجمعية)}</td>
+                  <td data-label="الحالة">${esc(x.حالة)}</td>
+                  <td data-label="عدد الاسهم"><b>${esc(x.عدد_الاسهم)}</b></td>
+                  <td data-label="بداية">${esc(x.تاريخ_البداية || "")}</td>
+                  <td data-label="نهاية">${esc(x.تاريخ_النهاية || "")}</td>
+                  <td data-label="فتح">
+                    <button class="btn btn2" onclick="location.href='society.html?معرف=${encodeURIComponent(x.معرف_الجمعية)}'">فتح</button>
+                  </td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `);
+    }
 
-  document.getElementById("socTitle").innerText = currentSociety.اسم;
-  document.getElementById("socMeta").innerHTML = `
-    <div>تاريخ البداية ${esc(currentSociety.تاريخ_البداية)}</div>
-    <div>تاريخ النهاية ${esc(currentSociety.تاريخ_النهاية)}</div>
-  `;
+    const all = await get("قائمة الجمعيات");
+    const societies = all.جمعيات || [];
+    const available = societies.filter(soc => String(soc.حالة) === "جديدة" && !subscribedIds.has(String(soc.معرف)));
 
-  document.getElementById("sharesInput").value = currentShares || "";
+    if(!available.length){
+      setHtml("availableSocieties", "<div class='warn warn-gray'>لا توجد جمعيات جديدة متاحة حاليا</div>");
+    }else{
+      setHtml("availableSocieties", `
+        <div class="grid">
+          ${available.map(soc => `
+            <div class="col-4">
+              <div class="soc" onclick="location.href='society.html?معرف=${encodeURIComponent(soc.معرف)}'">
+                <div style="display:flex;justify-content:space-between;gap:10px;align-items:center">
+                  <b>${esc(soc.اسم)}</b>
+                  ${badge(soc.حالة)}
+                </div>
+                <div style="margin-top:8px">تاريخ البداية ${esc(soc.تاريخ_البداية || "")}</div>
+                <div>تاريخ النهاية ${esc(soc.تاريخ_النهاية || "")}</div>
+                <div>عدد المشتركين ${esc(soc.عدد_المشتركين || 0)}</div>
+                <div>عدد الاسهم ${esc(soc.عدد_الاسهم || 0)}</div>
+                <div>قيمة الجمعية الاجمالي ${esc(soc.اجمالي_القيمة || 0)}</div>
+                <div style="margin-top:8px;color:#0e6f7f;font-weight:800">اضغط للتسجيل</div>
+              </div>
+            </div>
+          `).join("")}
+        </div>
+      `);
+    }
 
-  if(!currentPrefs){
-    showStepShares();
-  }else{
-    showSummary();
+  }catch(e){
+    msg("err", e.message);
   }
-}
-
-function showStepShares(){
-  show(document.getElementById("stepShares"));
-  hide(document.getElementById("stepPrefs"));
-  hide(document.getElementById("prefsSummary"));
-}
-
-function showStepPrefs(){
-  hide(document.getElementById("stepShares"));
-  show(document.getElementById("stepPrefs"));
-  hide(document.getElementById("prefsSummary"));
-
-  buildPrefsForm();
-}
-
-function showSummary(){
-  hide(document.getElementById("stepShares"));
-  hide(document.getElementById("stepPrefs"));
-  show(document.getElementById("prefsSummary"));
-
-  const body = document.getElementById("prefsSummaryBody");
-  body.innerHTML = monthsKeys.map((m,i)=>{
-    const v = Number(currentPrefs[`شهر ${i+1}`] || 0);
-    return v > 0 ? `<div>شهر ${i+1}: ${v} سهم</div>` : "";
-  }).join("");
-}
-
-async function saveShares(){
-  const v = Number(document.getElementById("sharesInput").value || 0);
-  if(v <= 0){
-    showMsg("err","عدد الأسهم غير صحيح");
-    return;
-  }
-
-  await get("تعديل اشتراك جمعية", {
-    token: userToken,
-    معرف_الجمعية: currentSocietyId,
-    عدد_الاسهم: v
-  });
-
-  // الرغبات انحذفت من السيرفر
-  currentPrefs = null;
-  currentShares = v;
-
-  showStepPrefs();
-}
-
-function buildPrefsForm(){
-  const box = document.getElementById("prefsForm");
-  box.innerHTML = monthsKeys.map((m,i)=>`
-    <div class="field">
-      <label>شهر ${i+1}</label>
-      <input type="number" min="0" step="0.5" class="input" id="pref_${i}">
-    </div>
-  `).join("");
-}
-
-async function savePrefs(){
-  const payload = {};
-  monthsKeys.forEach((_,i)=>{
-    payload[`شهر${i+1}`] = document.getElementById(`pref_${i}`).value || "0";
-    payload[`نوع${i+1}`] = "قابل للتعديل";
-  });
-
-  await get("حفظ الرغبات", {
-    token: userToken,
-    معرف_الجمعية: currentSocietyId,
-    ...payload
-  });
-
-  const data = await get("رغبات حالة", {
-    token: userToken,
-    معرف_الجمعية: currentSocietyId
-  });
-
-  currentPrefs = data.رغبات;
-  showSummary();
-}
-
-function editShares(){
-  showStepShares();
-}
-
-function editPrefs(){
-  showStepPrefs();
-}
-
-function backToSocieties(){
-  hide(document.getElementById("societyPage"));
-  show(document.getElementById("societiesList"));
-}
-
-(function(){
-  bootstrap();
 })();
+
+let _mobileBusy = false;
+
+async function saveMobile(){
+  if(_mobileBusy) return;
+  _mobileBusy = true;
+
+  const btn = document.getElementById("btnSaveMobile");
+  if(btn){
+    btn.disabled = true;
+    btn.style.opacity = "0.7";
+    btn.style.pointerEvents = "none";
+  }
+
+  msg("", "");
+
+  try{
+    const s = جلسة();
+    const رقم_الجوال = document.getElementById("newMobile").value.trim();
+    if(!رقم_الجوال){
+      msg("err", "رقم الجوال مطلوب");
+      return;
+    }
+
+    await get("تحديث رقم الجوال", { token: s.token, رقم_الجوال });
+    msg("ok", "تم تحديث رقم الجوال");
+    setTimeout(() => location.reload(), 700);
+
+  }catch(e){
+    msg("err", e.message || String(e));
+  }finally{
+    if(btn){
+      btn.disabled = false;
+      btn.style.opacity = "1";
+      btn.style.pointerEvents = "auto";
+    }
+    _mobileBusy = false;
+  }
+}
