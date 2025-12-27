@@ -10,13 +10,13 @@
   <div class="top">
     <div class="row">
       <div>
-        <a href="index.html" id="navHome">الشاشة الرئيسية</a>
-        <a href="register.html" id="navRegister">شاشة التسجيل</a>
+        <a href="index.html">الرئيسية</a>
+        <a href="register.html">التسجيل</a>
       </div>
-      <div style="font-weight:900">جمعية عائلية</div>
+      <div class="brand">جمعية عائلية</div>
       <div>
-        <a href="member.html" id="navMember">شاشة المشتركين</a>
-        <a href="admin.html" id="navAdmin">شاشة المدير</a>
+        <a href="member.html">صفحتي</a>
+        <a href="admin.html">المدير</a>
         <a href="#" id="navLogout" style="display:none">خروج</a>
       </div>
     </div>
@@ -26,21 +26,20 @@
     <div id="msg"></div>
 
     <div class="card">
-      <h3>بيانات المشترك</h3>
-      <div id="info"></div>
+      <h3 id="pageTitle">صفحتي</h3>
 
-      <div class="mt12">
-        <div class="pillTitle">تعديل رقم الجوال (مسموح فقط إذا لا توجد جمعيات نشطة أو مغلقة)</div>
-        <div class="grid mt8">
-          <div class="col-8">
-            <input class="input" id="newMobile" placeholder="رقم الجوال الجديد">
-          </div>
-          <div class="col-4">
-            <button class="btn btn2" id="btnSaveMobile" onclick="saveMobile()">حفظ</button>
-          </div>
+      <div id="pinArea" class="pinBox" style="display:none">
+        <div class="pinTitle">رمز PIN</div>
+        <div class="pinValue" id="myPinValue"></div>
+        <div class="align-end mt12">
+          <button class="btn" onclick="copyMyPin()">نسخ PIN</button>
+        </div>
+        <div id="pinStickyWarn" class="warn warn-orange mt12">
+          انسخ الرمز واحفظه للدخول لاحقًا
         </div>
       </div>
 
+      <div id="info"></div>
     </div>
 
     <div class="card">
@@ -49,7 +48,7 @@
     </div>
 
     <div class="card">
-      <h3>جمعيات متاحة للتسجيل (جديدة)</h3>
+      <h3>جمعيات متاحة للتسجيل</h3>
       <div id="availableSocieties"></div>
     </div>
   </div>
