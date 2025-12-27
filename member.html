@@ -1,69 +1,52 @@
-<!doctype html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>صفحتي</title>
-  <link rel="stylesheet" href="assets/css/styles.css">
-</head>
-<body class="member-theme">
-  <div class="top">
-    <div class="row topRow">
-      <div class="nav rightNav" id="navRight">
-        <a href="index.html" id="navHome">الرئيسية</a>
-        <a href="member.html" id="navRole" style="display:none">صفحتي</a>
-      </div>
+<div class="container">
 
-      <div class="brand" id="brandName">جمعية عائلية</div>
+  <div id="msg"></div>
 
-      <div class="nav leftNav" id="navLeft">
-        <a href="register.html" id="navLogin">تسجيل الدخول</a>
-        <a href="#" id="navLogout" style="display:none">خروج</a>
-        <a href="contact.html" id="navContact">التواصل</a>
-      </div>
-
-      <button class="menuBtn" id="menuBtn" aria-label="menu" type="button">≡</button>
-    </div>
-
-    <div class="mobileMenu" id="mobileMenu" style="display:none"></div>
+  <!-- بيانات المشترك -->
+  <div class="card">
+    <h3>بيانات المشترك</h3>
+    <div id="memberInfo"></div>
   </div>
 
-  <div class="container">
-    <div id="msg"></div>
-
-    <div class="card">
-      <h3>بيانات المشترك</h3>
-      <div id="info"></div>
-
-      <div class="mt12">
-        <div class="pillTitle">تعديل رقم الجوال (مسموح فقط إذا لا توجد جمعيات نشطة أو مغلقة)</div>
-        <div class="grid mt8">
-          <div class="col-8">
-            <input class="input" id="newMobile" placeholder="رقم الجوال الجديد">
-          </div>
-          <div class="col-4">
-            <button class="btn btn2" id="btnSaveMobile" onclick="saveMobile()">حفظ</button>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-    <div class="card">
-      <h3>الجمعيات المشترك بها</h3>
-      <div id="mySocieties"></div>
-    </div>
-
-    <div class="card">
-      <h3>جمعيات متاحة للتسجيل (جديدة)</h3>
-      <div id="availableSocieties"></div>
-    </div>
+  <!-- الجمعيات -->
+  <div class="card">
+    <h3>الجمعيات</h3>
+    <div id="societiesList"></div>
   </div>
 
-  <script src="assets/js/config.js"></script>
-  <script src="assets/js/api.js"></script>
-  <script src="assets/js/ui.js"></script>
-  <script src="assets/js/auth_ui.js"></script>
-  <script src="assets/js/pages/member.js"></script>
-</body>
-</html>
+  <!-- صفحة الجمعية -->
+  <div id="societyPage" style="display:none">
+
+    <div class="card">
+      <h3 id="socTitle"></h3>
+      <div id="socMeta"></div>
+    </div>
+
+    <!-- الخطوة 1: عدد الأسهم -->
+    <div class="card" id="stepShares">
+      <h3>الخطوة 1: تحديد عدد الأسهم</h3>
+      <div class="field">
+        <input type="number" id="sharesInput" min="0.5" step="0.5" class="input">
+      </div>
+      <button class="btn" onclick="saveShares()">حفظ عدد الأسهم</button>
+    </div>
+
+    <!-- الخطوة 2: الرغبات -->
+    <div class="card" id="stepPrefs" style="display:none">
+      <h3>الخطوة 2: اختيار رغبات الاستلام</h3>
+      <div id="prefsForm"></div>
+      <button class="btn" onclick="savePrefs()">حفظ الرغبات</button>
+    </div>
+
+    <!-- ملخص -->
+    <div class="card" id="prefsSummary" style="display:none">
+      <h3>ملخص الرغبات</h3>
+      <div id="prefsSummaryBody"></div>
+      <button class="btn btn2" onclick="editShares()">تعديل عدد الأسهم</button>
+      <button class="btn" onclick="editPrefs()">تعديل الرغبات</button>
+    </div>
+
+    <button class="btn btn2 mt12" onclick="backToSocieties()">رجوع</button>
+  </div>
+
+</div>
