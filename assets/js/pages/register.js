@@ -7,8 +7,21 @@
   }
 })();
 
+let _busyRegister = false;
+let _busyLogin = false;
+
+function disableAllButtons(disabled){
+  const btns = document.querySelectorAll("button");
+  btns.forEach(b => { b.disabled = !!disabled; });
+}
+
 async function register(){
+  if(_busyRegister) return;
+  _busyRegister = true;
+
   msg("", "");
+  disableAllButtons(true);
+
   try{
     const الاسم = document.getElementById("name").value.trim();
     const رقم_الجوال = document.getElementById("mobile").value.trim();
@@ -22,20 +35,31 @@ async function register(){
 
     msg("ok", "تم التسجيل بنجاح");
     setTimeout(()=>location.href="member.html", 700);
+
   }catch(e){
-    msg("err", e.message);
+    msg("err", e.message || String(e));
+    disableAllButtons(false);
+    _busyRegister = false;
   }
 }
 
 async function login(){
+  if(_busyLogin) return;
+  _busyLogin = true;
+
   msg("", "");
+  disableAllButtons(true);
+
   try{
     const رمز = document.getElementById("pin").value.trim();
     const data = await post({ action:"دخول بالرمز", رمز });
 
     حفظ_جلسة(data.token, data.دور);
     location.href = (data.دور==="مدير") ? "admin.html" : "member.html";
+
   }catch(e){
-    msg("err", e.message);
+    msg("err", e.message || String(e));
+    disableAllButtons(false);
+    _busyLogin = false;
   }
 }
