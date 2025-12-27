@@ -6,50 +6,67 @@ function jsonp(action, params = {}) {
     url.searchParams.set("action", action);
     url.searchParams.set("callback", cb);
 
-    for (const k in params) url.searchParams.set(k, params[k]);
+    for (const [k, v] of Object.entries(params)) {
+      url.searchParams.set(k, v);
+    }
 
-    const s = document.createElement("script");
+    const script = document.createElement("script");
+    const timer = setTimeout(() => {
+      cleanup();
+      reject(new Error("انتهت مهلة الاتصال"));
+    }, 15000);
 
-    window[cb] = (res) => {
-      delete window[cb];
-      s.remove();
-      if(!res || !res.ok) reject(new Error(res.error || "خطأ"));
-      else resolve(res.data);
+    function cleanup() {
+      clearTimeout(timer);
+      try { delete window[cb]; } catch (e) {}
+      script.remove();
+    }
+
+    window[cb] = (response) => {
+      cleanup();
+      if (!response || response.ok !== true) {
+        reject(new Error(response && response.error ? response.error : "خطأ غير معروف"));
+        return;
+      }
+      resolve(response.data);
     };
 
-    s.onerror = () => {
-      delete window[cb];
-      s.remove();
-      reject(new Error("فشل الاتصال"));
+    script.onerror = () => {
+      cleanup();
+      reject(new Error("فشل الاتصال بالخدمة"));
     };
 
-    s.src = url.toString();
-    document.body.appendChild(s);
+    script.src = url.toString();
+    document.body.appendChild(script);
   });
 }
 
-function get(action, params){
-  return jsonp(action, params);
+async function get(action, params = {}) {
+  return await jsonp(action, params);
 }
 
-function post(body){
-  const { action, ...params } = body;
-  return jsonp(action, params);
+async function post(body) {
+  const action = body.action;
+  const params = { ...body };
+  delete params.action;
+  return await jsonp(action, params);
 }
 
-function حفظ_جلسة(token, role){
-  localStorage.setItem("token", token);
-  localStorage.setItem("role", role);
+function حفظ_جلسة(token, role, name) {
+  localStorage.setItem("token", token || "");
+  localStorage.setItem("role", role || "");
+  if(name != null) localStorage.setItem("name", String(name || ""));
 }
 
-function جلسة(){
+function جلسة() {
   return {
     token: localStorage.getItem("token") || "",
-    role: localStorage.getItem("role") || ""
+    role: localStorage.getItem("role") || "",
+    name: localStorage.getItem("name") || ""
   };
 }
 
-function خروج(){
+function خروج() {
   localStorage.clear();
   location.href = "register.html";
 }
