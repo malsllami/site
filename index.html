@@ -1,26 +1,31 @@
 <!doctype html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>الشاشة الرئيسية</title>
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
-<body>
+<body class="visitor-theme">
   <div class="top">
-    <div class="row">
-      <div>
-        <a href="index.html" id="navHome">الشاشة الرئيسية</a>
-        <a href="register.html" id="navRegister">شاشة التسجيل</a>
-        <a href="contact.html" id="navContact">شاشة التواصل</a>
+    <div class="row topRow">
+      <div class="nav rightNav" id="navRight">
+        <a href="index.html" id="navHome">الرئيسية</a>
+        <a href="#" id="navRole" style="display:none"></a>
       </div>
-      <div style="font-weight:900">جمعية عائلية</div>
-      <div>
-        <a href="member.html" id="navMember">شاشة المشتركين</a>
-        <a href="admin.html" id="navAdmin">شاشة المدير</a>
+
+      <div class="brand" id="brandName">جمعية عائلية</div>
+
+      <div class="nav leftNav" id="navLeft">
+        <a href="register.html" id="navLogin">تسجيل الدخول</a>
         <a href="#" id="navLogout" style="display:none">خروج</a>
+        <a href="contact.html" id="navContact">التواصل</a>
       </div>
+
+      <button class="menuBtn" id="menuBtn" aria-label="menu" type="button">≡</button>
     </div>
+
+    <div class="mobileMenu" id="mobileMenu" style="display:none"></div>
   </div>
 
   <div class="container">
