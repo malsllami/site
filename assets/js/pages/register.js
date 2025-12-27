@@ -1,76 +1,82 @@
-<!doctype html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>شاشة التسجيل</title>
-  <link rel="stylesheet" href="assets/css/styles.css">
-</head>
-<body>
-  <div class="top">
-    <div class="row">
-      <div>
-        <a href="index.html" id="navHome">الرئيسية</a>
-      </div>
-      <div class="brand">جمعية عائلية</div>
-      <div>
-        <a href="register.html" id="navRegister">التسجيل</a>
-        <a href="member.html" id="navMember">صفحتي</a>
-        <a href="admin.html" id="navAdmin">شاشة المدير</a>
-        <a href="#" id="navLogout" style="display:none">خروج</a>
-      </div>
-    </div>
-  </div>
+(function(){
+  const s = جلسة();
+  if(s.token){
+    location.href = (s.role === "مدير") ? "admin.html" : "member.html";
+  }
+})();
 
-  <div class="container">
-    <div id="msg"></div>
+let _regBusy = false;
+let _loginBusy = false;
+let _lastPin = "";
 
-    <div class="card">
-      <h3>تسجيل جديد</h3>
-      <div class="grid2">
-        <div>
-          <label>الاسم</label>
-          <input id="name" type="text">
-        </div>
-        <div>
-          <label>رقم الجوال</label>
-          <input id="mobile" type="text">
-        </div>
-      </div>
-      <div class="mt12">
-        <button class="btn" id="btnRegister" onclick="register()">تسجيل</button>
-      </div>
+function disable(id, on){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.disabled = !!on;
+  el.style.opacity = on ? "0.7" : "1";
+  el.style.pointerEvents = on ? "none" : "auto";
+}
 
-      <div class="mt12" id="pinBox" style="display:none">
-        <div class="warn warn-orange" id="pinWarn">انسخ رمز PIN واحتفظ به</div>
-        <div class="kv">
-          <div class="k">رمز PIN</div>
-          <div class="v" id="pinValue"></div>
-        </div>
-        <div class="ok" id="pinCopied" style="display:none">تم النسخ</div>
-        <div class="align-end mt12">
-          <button class="btn btn2" onclick="copyPin()">نسخ</button>
-        </div>
-      </div>
-    </div>
+async function register(){
+  if(_regBusy) return;
+  _regBusy = true;
+  msg("", "");
+  disable("btnRegister", true);
 
-    <div class="card">
-      <h3>دخول بالرمز</h3>
-      <label>رمز PIN</label>
-      <input id="pin" type="text">
-      <div class="mt12">
-        <button class="btn" id="btnLogin" onclick="login()">دخول</button>
-      </div>
-      <div class="mt12 warn warn-gray">
-        رمز المدير الافتراضي 111111
-      </div>
-    </div>
-  </div>
+  try{
+    const الاسم = document.getElementById("name").value.trim();
+    const رقم_الجوال = document.getElementById("mobile").value.trim();
 
-  <script src="assets/js/config.js"></script>
-  <script src="assets/js/api.js"></script>
-  <script src="assets/js/ui.js"></script>
-  <script src="assets/js/auth_ui.js"></script>
-  <script src="assets/js/pages/register.js"></script>
-</body>
-</html>
+    const data = await post({ action: "تسجيل جديد", الاسم, رقم_الجوال });
+    حفظ_جلسة(data.token, data.دور, data.الاسم);
+
+    _lastPin = String(data.رمز || "").trim();
+    document.getElementById("pinBox").style.display = "";
+    document.getElementById("pinValue").textContent = _lastPin;
+    document.getElementById("pinCopied").style.display = "none";
+    document.getElementById("pinWarn").style.display = "";
+
+    msg("ok", "تم التسجيل بنجاح");
+  }catch(e){
+    msg("err", e.message);
+  }finally{
+    disable("btnRegister", false);
+    _regBusy = false;
+  }
+}
+
+async function copyPin(){
+  if(!_lastPin) return;
+  try{
+    await navigator.clipboard.writeText(_lastPin);
+  }catch(e){
+    const t = document.createElement("textarea");
+    t.value = _lastPin;
+    document.body.appendChild(t);
+    t.select();
+    try{ document.execCommand("copy"); }catch(_e){}
+    t.remove();
+  }
+  document.getElementById("pinCopied").style.display = "";
+  document.getElementById("pinWarn").style.display = "none";
+  location.href = "member.html";
+}
+
+async function login(){
+  if(_loginBusy) return;
+  _loginBusy = true;
+  msg("", "");
+  disable("btnLogin", true);
+
+  try{
+    const رمز = document.getElementById("pin").value.trim();
+    const data = await post({ action: "دخول بالرمز", رمز });
+    حفظ_جلسة(data.token, data.دور, data.الاسم);
+    location.href = (data.دور === "مدير") ? "admin.html" : "member.html";
+  }catch(e){
+    msg("err", e.message);
+  }finally{
+    disable("btnLogin", false);
+    _loginBusy = false;
+  }
+}
