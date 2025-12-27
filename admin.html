@@ -1,4 +1,3 @@
-<!-- site/admin.html , انسخه واستبدله بالكامل -->
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -9,22 +8,24 @@
 </head>
 <body class="admin-theme">
   <div class="top">
-    <div class="row">
-      <button class="hamburger" id="btnMenu" aria-label="القائمة" onclick="toggleMobileMenu()">
-        <span></span><span></span><span></span>
-      </button>
-
-      <div class="nav mobileMenu" id="mobileMenu">
-        <a href="index.html" id="navHome">الشاشة الرئيسية</a>
-        <a href="register.html" id="navRegister">شاشة التسجيل</a>
-        <a href="contact.html" id="navContact">شاشة التواصل</a>
-        <a href="member.html" id="navMember">شاشة المشتركين</a>
-        <a href="admin.html" id="navAdmin">شاشة المدير</a>
-        <a href="#" id="navLogout" style="display:none">خروج</a>
+    <div class="row topRow">
+      <div class="nav rightNav" id="navRight">
+        <a href="index.html" id="navHome">الرئيسية</a>
+        <a href="admin.html" id="navRole" style="display:none">شاشة المدير</a>
       </div>
 
-      <div class="brand">جمعية عائلية</div>
+      <div class="brand" id="brandName">جمعية عائلية</div>
+
+      <div class="nav leftNav" id="navLeft">
+        <a href="register.html" id="navLogin">تسجيل الدخول</a>
+        <a href="#" id="navLogout" style="display:none">خروج</a>
+        <a href="contact.html" id="navContact">التواصل</a>
+      </div>
+
+      <button class="menuBtn" id="menuBtn" aria-label="menu" type="button">≡</button>
     </div>
+
+    <div class="mobileMenu" id="mobileMenu" style="display:none"></div>
   </div>
 
   <div class="container">
@@ -54,58 +55,42 @@
       <div id="dashboard">
 
         <div class="card">
-          <div class="tabs">
-            <button class="tab active" onclick="switchDash('societies', event)">الجمعيات</button>
-            <button class="tab" onclick="switchDash('members', event)">المشتركين</button>
-          </div>
-          <div class="small mt8">اختر القسم من الأعلى</div>
-        </div>
-
-        <!-- قسم الجمعيات -->
-        <div id="dash-societies">
-          <div class="card">
-            <div class="cardHead">
-              <h3>انشاء جمعية جديدة</h3>
-              <div class="muted">صيغة التاريخ ثابتة عبر اختيار التقويم</div>
-            </div>
-
-            <div class="grid">
-              <div class="col-6">
-                <div class="field">
-                  <div class="labelPill">اسم الجمعية</div>
-                  <input class="input" id="socName" placeholder="مثال , جمعية 1">
-                </div>
-              </div>
-              <div class="col-6">
-                <div class="field">
-                  <div class="labelPill">تاريخ البداية</div>
-                  <input class="input" id="socStart" type="date">
-                </div>
-              </div>
-              <div class="col-12 align-end">
-                <button class="btn" id="btnCreate" onclick="createSoc()">انشاء</button>
-              </div>
-            </div>
+          <div class="cardHead">
+            <h3>انشاء جمعية جديدة</h3>
+            <div class="muted">صيغة التاريخ ثابتة عبر اختيار التقويم</div>
           </div>
 
-          <div class="card">
-            <div class="cardHead">
-              <h3>الجمعيات</h3>
-              <div class="muted">اضغط فتح لعرض تفاصيل الجمعية داخل لوحة المدير</div>
+          <div class="grid">
+            <div class="col-6">
+              <div class="field">
+                <div class="labelPill">اسم الجمعية</div>
+                <input class="input" id="socName" placeholder="مثال , جمعية 1">
+              </div>
             </div>
-            <div class="grid" id="societiesAdmin"></div>
+            <div class="col-6">
+              <div class="field">
+                <div class="labelPill">تاريخ البداية</div>
+                <input class="input" id="socStart" type="date">
+              </div>
+            </div>
+            <div class="col-12 align-end">
+              <button class="btn" id="btnCreate" onclick="createSoc()">انشاء</button>
+            </div>
           </div>
         </div>
 
-        <!-- قسم المشتركين -->
-        <div id="dash-members" style="display:none">
-          <div class="card">
-            <div class="cardHead">
-              <h3>المشتركين</h3>
-              <div class="muted">عرض كبطاقات, اضغط فتح لإدارة المشترك</div>
-            </div>
-            <div class="grid" id="membersCards"></div>
+        <div class="card">
+          <div class="cardHead">
+            <h3>الجمعيات</h3>
+            <div class="muted">اضغط فتح لعرض تفاصيل الجمعية داخل لوحة المدير</div>
           </div>
+          <div class="grid" id="societiesAdmin"></div>
+        </div>
+
+        <!-- المشتركين لا يظهرون هنا, يظهرون فقط عند الضغط على تبويب المشتركين داخل لوحة الجمعية -->
+        <div class="card" style="display:none">
+          <h3>المشتركين</h3>
+          <div id="members"></div>
         </div>
 
       </div>
@@ -125,7 +110,9 @@
 
           <div class="tabs mt12">
             <button class="tab active" onclick="switchTab('months', event)">بطاقات الأشهر</button>
-            <button class="tab" onclick="switchTab('members', event)">جدول الأعضاء</button>
+            <button class="tab" onclick="switchTab('collection', event)">التحصيل</button>
+            <button class="tab" onclick="switchTab('delivery', event)">التسليم</button>
+            <button class="tab" onclick="switchTab('members', event)">المشتركين</button>
             <button class="tab" onclick="switchTab('changes', event)">التغييرات</button>
           </div>
         </div>
@@ -139,13 +126,31 @@
           <div id="monthsGrid" class="monthsGrid"></div>
         </div>
 
-        <!-- تبويب جدول الأعضاء -->
+        <!-- تبويب التحصيل -->
+        <div class="card" id="tab-collection" style="display:none">
+          <div class="cardHead">
+            <h3>التحصيل</h3>
+            <div class="muted">سيتم بناء بطاقات التحصيل لكل شهر هنا</div>
+          </div>
+          <div id="collectionBox"></div>
+        </div>
+
+        <!-- تبويب التسليم -->
+        <div class="card" id="tab-delivery" style="display:none">
+          <div class="cardHead">
+            <h3>التسليم</h3>
+            <div class="muted">سيتم بناء بطاقات التسليم لكل شهر هنا</div>
+          </div>
+          <div id="deliveryBox"></div>
+        </div>
+
+        <!-- تبويب المشتركين -->
         <div class="card" id="tab-members" style="display:none">
           <div class="cardHead">
-            <h3>الأعضاء وتوزيع الأسهم 1 الى 10</h3>
-            <div class="muted">عرض فقط</div>
+            <h3>المشتركين</h3>
+            <div class="muted">عرض كبطاقات</div>
           </div>
-          <div id="societyMembersTable"></div>
+          <div id="societyMembersCards"></div>
         </div>
 
         <!-- تبويب التغييرات -->
