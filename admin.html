@@ -1,4 +1,4 @@
-<!-- admin.html  , انسخه واستبدله بالكامل -->
+<!-- site/admin.html , انسخه واستبدله بالكامل -->
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
@@ -109,6 +109,8 @@
 
           <div class="tabs mt12">
             <button class="tab active" onclick="switchTab('months', event)">بطاقات الأشهر</button>
+            <button class="tab" onclick="switchTab('collection', event)">التحصيل</button>
+            <button class="tab" onclick="switchTab('delivery', event)">التسليم</button>
             <button class="tab" onclick="switchTab('members', event)">جدول الأعضاء</button>
             <button class="tab" onclick="switchTab('changes', event)">التغييرات</button>
           </div>
@@ -121,6 +123,24 @@
             <div class="muted">الألوان تعكس حالة الشهر حسب القدرة المتاحة للتسليم</div>
           </div>
           <div id="monthsGrid" class="monthsGrid"></div>
+        </div>
+
+        <!-- تبويب التحصيل -->
+        <div class="card" id="tab-collection" style="display:none">
+          <div class="cardHead">
+            <h3>التحصيل</h3>
+            <div class="muted">كل شهر بطاقة, كل مشترك سطر, وتفعيل تم التحصيل يسجل في جدول التحصيل</div>
+          </div>
+          <div id="collectionGrid" class="monthsGrid"></div>
+        </div>
+
+        <!-- تبويب التسليم -->
+        <div class="card" id="tab-delivery" style="display:none">
+          <div class="cardHead">
+            <h3>التسليم</h3>
+            <div class="muted">يعرض فقط المشتركين اللي لهم رغبات في هذا الشهر</div>
+          </div>
+          <div id="deliveryGrid" class="monthsGrid"></div>
         </div>
 
         <!-- تبويب جدول الأعضاء -->
