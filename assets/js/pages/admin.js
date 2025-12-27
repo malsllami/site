@@ -414,7 +414,7 @@ function buildCollectionCards(model){
         <div class="accRow" style="gap:10px;align-items:center">
           <span style="min-width:160px"><b>${esc(r.الاسم||"")}</b></span>
           <span style="min-width:90px">${esc(fmtNum(r.عدد_الاسهم||0))}</span>
-          <span style="min-width:110px">${esc(Math.round(r.قيمة_التحصيل||0))}</span>
+          <span style="min-width:130px">${esc(Math.round(r.قيمة_التحصيل||0))}</span>
           <span style="min-width:70px">
             <input type="checkbox" id="${esc(id)}" ${checked ? "checked" : ""}>
           </span>
@@ -434,7 +434,7 @@ function buildCollectionCards(model){
         <div class="accRow" style="font-weight:900;opacity:.9">
           <span style="min-width:160px">الاسم</span>
           <span style="min-width:90px">عدد الاسهم</span>
-          <span style="min-width:110px">قيمة التحصيل</span>
+          <span style="min-width:130px">قيمة التحصيل</span>
           <span style="min-width:70px">تم</span>
           <span style="min-width:120px">تاريخ التحصيل</span>
         </div>
@@ -447,7 +447,6 @@ function buildCollectionCards(model){
 
     grid.appendChild(el);
 
-    // ربط الاحداث بعد الاضافة للـ DOM
     (cardModel.صفوف || []).forEach(r=>{
       const id = `col_${cardModel.رقم_الشهر}_${r.معرف_المستخدم}`;
       const cb = document.getElementById(id);
@@ -499,8 +498,8 @@ function buildDeliveryCards(model){
       return `
         <div class="accRow" style="gap:10px;align-items:center">
           <span style="min-width:160px"><b>${esc(r.الاسم||"")}</b></span>
-          <span style="min-width:90px">${esc(fmtNum(r.اسهم_هذا_الشهر||0))}</span>
-          <span style="min-width:110px">${esc(Math.round(r.قيمة_التسليم||0))}</span>
+          <span style="min-width:120px">${esc(fmtNum(r.اسهم_هذا_الشهر||0))}</span>
+          <span style="min-width:130px">${esc(Math.round(r.قيمة_التسليم||0))}</span>
           <span style="min-width:70px">
             <input type="checkbox" id="${esc(id)}" ${checked ? "checked" : ""}>
           </span>
@@ -523,8 +522,8 @@ function buildDeliveryCards(model){
       <div class="accordion" style="display:block">
         <div class="accRow" style="font-weight:900;opacity:.9">
           <span style="min-width:160px">الاسم</span>
-          <span style="min-width:90px">اسهم هذا الشهر</span>
-          <span style="min-width:110px">مبلغ التسليم</span>
+          <span style="min-width:120px">اسهم هذا الشهر</span>
+          <span style="min-width:130px">مبلغ التسليم</span>
           <span style="min-width:70px">تم</span>
           <span style="min-width:120px">تاريخ التسليم</span>
         </div>
@@ -613,7 +612,6 @@ async function openSociety(id){
     if(firstTab) firstTab.classList.add("active");
     switchTab("months", null);
 
-    // تحميل التحصيل والتسليم
     try{
       const col = await get("تحصيل حالة للمدير", { token: adminToken, معرف_الجمعية: id });
       buildCollectionCards(col);
