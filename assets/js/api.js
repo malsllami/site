@@ -52,15 +52,17 @@ async function post(body) {
   return await jsonp(action, params);
 }
 
-function حفظ_جلسة(token, role) {
+function حفظ_جلسة(token, role, name) {
   localStorage.setItem("token", token || "");
   localStorage.setItem("role", role || "");
+  if(name != null) localStorage.setItem("name", String(name || ""));
 }
 
 function جلسة() {
   return {
     token: localStorage.getItem("token") || "",
-    role: localStorage.getItem("role") || ""
+    role: localStorage.getItem("role") || "",
+    name: localStorage.getItem("name") || ""
   };
 }
 
