@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>شاشة المشتركين</title>
+  <title>صفحتي</title>
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
@@ -28,11 +28,29 @@
     <div class="card">
       <h3>بيانات المشترك</h3>
       <div id="info"></div>
+
+      <div class="mt12">
+        <div class="pillTitle">تعديل رقم الجوال (مسموح فقط إذا لا توجد جمعيات نشطة أو مغلقة)</div>
+        <div class="grid mt8">
+          <div class="col-8">
+            <input class="input" id="newMobile" placeholder="رقم الجوال الجديد">
+          </div>
+          <div class="col-4">
+            <button class="btn btn2" id="btnSaveMobile" onclick="saveMobile()">حفظ</button>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <div class="card">
       <h3>الجمعيات المشترك بها</h3>
       <div id="mySocieties"></div>
+    </div>
+
+    <div class="card">
+      <h3>جمعيات متاحة للتسجيل (جديدة)</h3>
+      <div id="availableSocieties"></div>
     </div>
   </div>
 
