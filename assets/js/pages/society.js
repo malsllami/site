@@ -61,13 +61,13 @@ function monthLabelHijriFromYYYYMM(yyyyMM){
 
 function renderSocInfo(s){
   return (
-    "اسم الجمعية <b>" + esc(s.اسم) + "</b><br>" +
-    "تاريخ البداية <b>" + esc(s.تاريخ_البداية) + "</b><br>" +
-    "تاريخ النهاية <b>" + esc(s.تاريخ_النهاية) + "</b><br>" +
-    "الحالة <b>" + esc(s.حالة) + "</b><br>" +
-    "عدد المشتركين <b>" + esc(s.عدد_المشتركين) + "</b><br>" +
-    "عدد الاسهم <b>" + esc(s.عدد_الاسهم) + "</b><br>" +
-    "قيمة الجمعية الاجمالي <b>" + esc(s.اجمالي_القيمة) + "</b>"
+    `<div class="kv"><div class="k">اسم الجمعية</div><div class="v"><b>${esc(s.اسم)}</b></div></div>` +
+    `<div class="kv"><div class="k">تاريخ البداية</div><div class="v"><b>${esc(s.تاريخ_البداية)}</b></div></div>` +
+    `<div class="kv"><div class="k">تاريخ النهاية</div><div class="v"><b>${esc(s.تاريخ_النهاية)}</b></div></div>` +
+    `<div class="kv"><div class="k">الحالة</div><div class="v"><b>${esc(s.حالة)}</b></div></div>` +
+    `<div class="kv"><div class="k">عدد المشتركين</div><div class="v"><b>${esc(s.عدد_المشتركين)}</b></div></div>` +
+    `<div class="kv"><div class="k">عدد الاسهم</div><div class="v"><b>${esc(s.عدد_الاسهم)}</b></div></div>` +
+    `<div class="kv"><div class="k">قيمة الجمعية الاجمالي</div><div class="v"><b>${esc(s.اجمالي_القيمة)}</b></div></div>`
   );
 }
 
@@ -158,6 +158,25 @@ function renderJoinBoxNewSociety(canJoin){
   `;
 }
 
+function renderEditBox(currentShares){
+  return `
+    <div class="grid">
+      <div class="col-12">
+        <div class="warn warn-orange">تنبيه, تعديل عدد الأسهم مسموح فقط في جمعية جديدة, بعد التحول الى نشطة يمنع التعديل</div>
+      </div>
+      <div class="col-8">
+        <input id="editShares" class="input" placeholder="عدد الاسهم الجديد" value="${esc(currentShares)}">
+      </div>
+      <div class="col-4">
+        <button class="btn btn2" id="btnEditShares">تعديل</button>
+      </div>
+      <div class="col-12 align-end">
+        <button class="btn" id="btnWithdraw" style="background:#b23b3b">انسحاب من الجمعية</button>
+      </div>
+    </div>
+  `;
+}
+
 (async function(){
   const sid = q("معرف");
   if(!sid){
@@ -201,6 +220,7 @@ function renderJoinBoxNewSociety(canJoin){
       document.getElementById("joinCard").style.display = "none";
       document.getElementById("btnPrefs").style.display = "none";
       document.getElementById("prefCard").style.display = "none";
+      document.getElementById("editCard").style.display = "none";
       return;
     }
 
@@ -252,6 +272,36 @@ function renderJoinBoxNewSociety(canJoin){
       }catch(e){
         document.getElementById("prefCard").style.display = "none";
       }
+    }
+
+    // إدارة الاشتراك (تعديل أسهم, انسحاب) فقط إذا جمعية جديدة والمشترك مسجل
+    if(isSubscribed && String(soc.حالة)==="جديدة"){
+      document.getElementById("editCard").style.display = "";
+      setHtml("editBox", renderEditBox(memberInfo.عدد_اسهم_المشترك || 0));
+
+      document.getElementById("btnEditShares").onclick = async function(){
+        try{
+          const val = document.getElementById("editShares").value;
+          await get("تعديل اشتراك جمعية", { token:s.token, معرف_الجمعية:sid, عدد_الاسهم:val });
+          msg("ok","تم تعديل عدد الاسهم");
+          setTimeout(()=> location.reload(), 700);
+        }catch(e){
+          msg("err", e.message || String(e));
+        }
+      };
+
+      document.getElementById("btnWithdraw").onclick = async function(){
+        if(!confirm("تأكيد الانسحاب من الجمعية؟")) return;
+        try{
+          await get("انسحاب جمعية", { token:s.token, معرف_الجمعية:sid });
+          msg("ok","تم الانسحاب");
+          setTimeout(()=> location.href="member.html", 700);
+        }catch(e){
+          msg("err", e.message || String(e));
+        }
+      };
+    }else{
+      document.getElementById("editCard").style.display = "none";
     }
 
   }catch(e){
