@@ -1,22 +1,22 @@
 <!doctype html>
-<html lang="ar" dir="rtl">
+<html lang="ar">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>المدير</title>
+  <title>شاشة المدير</title>
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
   <div class="top">
     <div class="row">
       <div>
-        <a href="index.html" id="navHome">الرئيسية</a>
-        <a href="register.html" id="navRegister">التسجيل</a>
+        <a href="index.html" id="navHome">الشاشة الرئيسية</a>
+        <a href="register.html" id="navRegister">شاشة التسجيل</a>
       </div>
       <div class="brand">جمعية عائلية</div>
       <div>
-        <a href="member.html" id="navMember" style="display:none">صفحتي</a>
-        <a href="admin.html" id="navAdmin" style="display:none">المدير</a>
+        <a href="member.html" id="navMember">صفحتي</a>
+        <a href="admin.html" id="navAdmin">شاشة المدير</a>
         <a href="#" id="navLogout" style="display:none">خروج</a>
       </div>
     </div>
@@ -26,30 +26,32 @@
     <div id="msg"></div>
 
     <div class="card">
-      <h3>لوحة المدير</h3>
+      <h3>انشاء جمعية جديدة</h3>
+
       <div class="grid2">
         <div>
-          <label>اسم الجمعية</label>
-          <input id="socName" class="input" placeholder="اسم الجمعية">
+          <div class="lbl">اسم الجمعية</div>
+          <input id="societyName" class="in" placeholder="اسم الجمعية">
         </div>
         <div>
-          <label>تاريخ البداية</label>
-          <input id="socStart" class="input" placeholder="yyyy-mm-dd">
+          <div class="lbl">تاريخ البداية</div>
+          <input id="societyStart" class="in" type="date">
         </div>
       </div>
-      <div class="mt12 align-end">
-        <button class="btn" id="btnCreate" onclick="createSociety()">انشاء جمعية</button>
+
+      <div class="align-end mt12">
+        <button id="btnCreateSociety" class="btn">انشاء</button>
       </div>
     </div>
 
     <div class="card">
-      <h3>قائمة الجمعيات</h3>
-      <div id="adminSocieties"></div>
+      <h3>الجمعيات</h3>
+      <div id="societies"></div>
     </div>
 
     <div class="card">
       <h3>المشتركين</h3>
-      <div id="adminMembers"></div>
+      <div id="members"></div>
     </div>
   </div>
 
