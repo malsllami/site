@@ -38,3 +38,115 @@ input:focus, select:focus { border-color: #1f6b4a; }
 .table th, .table td { padding: 10px; border-bottom: 1px solid #eee; text-align: right; vertical-align: top; }
 .table th { background: #f7fbf9; }
 .small { font-size: 12px; color: #666; }
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.cardItem {
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 14px;
+  padding: 14px;
+}
+
+.cardItem .titleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cardItem .titleRow b {
+  font-size: 16px;
+}
+
+.cardItem .meta {
+  margin-top: 10px;
+  display: grid;
+  gap: 6px;
+  font-size: 14px;
+  color: rgba(0,0,0,0.75);
+}
+
+.cardItem .actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.pill {
+  background: rgba(0,0,0,0.05);
+  border: 1px solid rgba(0,0,0,0.06);
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+}
+
+.monthCard {
+  margin-top: 12px;
+}
+
+.memberCards {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+
+.memberCard {
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.08);
+  border-radius: 14px;
+  padding: 12px;
+}
+
+.memberCard .row2 {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+
+.memberCard .name {
+  font-weight: 700;
+}
+
+.memberCard .small {
+  font-size: 13px;
+  color: rgba(0,0,0,0.7);
+  margin-top: 6px;
+}
+
+.memberCard .controls {
+  margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  align-items: center;
+}
+
+.btnMini {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 0;
+  cursor: pointer;
+}
+
+.btnMiniGray {
+  background: rgba(0,0,0,0.08);
+}
+
+.btnMiniGreen {
+  background: #0f7a4a;
+  color: #fff;
+}
