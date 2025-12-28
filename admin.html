@@ -10,13 +10,11 @@
   <div class="top">
     <div class="row">
       <div>
-        <a href="index.html" id="navHome">الرئيسية</a>
-        <a href="register.html" id="navRegister">شاشة التسجيل</a>
+        <a href="admin.html">شاشة المدير</a>
       </div>
       <div class="brand">جمعية عائلية</div>
       <div>
-        <a href="member.html" id="navMember">صفحتي</a>
-        <a href="admin.html" id="navAdmin">شاشة المدير</a>
+        <a href="admin_users.html" id="navUsers">المشتركين</a>
         <a href="#" id="navLogout" style="display:none">خروج</a>
       </div>
     </div>
@@ -27,27 +25,30 @@
 
     <div class="card">
       <h3>انشاء جمعية جديدة</h3>
-
-      <div class="grid2">
+      <div class="formRow">
         <div class="field">
           <label>اسم الجمعية</label>
-          <input id="socName" type="text" autocomplete="off">
+          <input id="socName" class="input" placeholder="اسم الجمعية">
         </div>
-
         <div class="field">
           <label>تاريخ البداية</label>
-          <input id="socStart" type="date">
+          <input id="socStart" class="input" type="date">
+        </div>
+        <div class="field" style="align-self:end">
+          <button class="btn" id="btnCreate" onclick="createSociety()">انشاء</button>
         </div>
       </div>
-
-      <div class="align-end mt12">
-        <button id="btnCreateSoc" class="btn" type="button">انشاء</button>
-      </div>
+      <div class="small mt8">ملاحظة, اكتب التاريخ من التقويم فقط</div>
     </div>
 
     <div class="card">
-      <h3>الجمعيات</h3>
-      <div id="socList"></div>
+      <h3>جمعيات جديدة</h3>
+      <div id="newSocieties" class="cards"></div>
+    </div>
+
+    <div class="card">
+      <h3>جمعيات نشطة ومغلقة</h3>
+      <div id="activeSocieties" class="cards"></div>
     </div>
   </div>
 
