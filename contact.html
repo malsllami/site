@@ -2,78 +2,27 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>شاشة التواصل</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>تواصل</title>
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
-<body class="visitor-theme">
+<body>
   <div class="top">
-    <div class="row topRow">
-      <div class="nav rightNav" id="navRight">
-        <a href="index.html" id="navHome">الرئيسية</a>
-        <a href="#" id="navRole" style="display:none"></a>
+    <div class="row">
+      <div>
+        <a href="index.html">الرئيسية</a>
       </div>
-
-      <div class="brand" id="brandName">جمعية عائلية</div>
-
-      <div class="nav leftNav" id="navLeft">
-        <a href="register.html" id="navLogin">تسجيل الدخول</a>
+      <div class="brand">جمعية عائلية</div>
+      <div>
         <a href="#" id="navLogout" style="display:none">خروج</a>
-        <a href="contact.html" id="navContact">التواصل</a>
       </div>
-
-      <button class="menuBtn" id="menuBtn" aria-label="menu" type="button">≡</button>
     </div>
-
-    <div class="mobileMenu" id="mobileMenu" style="display:none"></div>
   </div>
 
   <div class="container">
-    <div id="msg"></div>
-
     <div class="card">
-      <h3>التواصل</h3>
-      <div class="muted">اضغط على الأيقونة للانتقال مباشرة</div>
-
-      <div class="iconGrid mt12">
-        <a class="iconCard" href="tel:+966555889581" aria-label="call">
-          <div class="iconWrap" title="جوال">
-            <svg viewBox="0 0 24 24" class="ico" aria-hidden="true">
-              <path d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 2v16h10V4H7zm5 15a1 1 0 1 0 0 2a1 1 0 0 0 0-2z"/>
-            </svg>
-          </div>
-          <div class="iconLabel">جوال</div>
-        </a>
-
-        <a class="iconCard" href="https://wa.me/966555889581" target="_blank" rel="noopener" aria-label="whatsapp">
-          <div class="iconWrap" title="واتساب">
-            <svg viewBox="0 0 24 24" class="ico" aria-hidden="true">
-              <path d="M20.5 11.9A8.5 8.5 0 0 1 7.7 19.2L3 21l1.9-4.5A8.5 8.5 0 1 1 20.5 11.9zm-8.5-7A7 7 0 0 0 5.7 15.9l.2.4l-1 2.4l2.5-1l.4.2A7 7 0 1 0 12 4.9zm3.8 9.6c-.2.6-1.1 1.1-1.5 1.2c-.3.1-.7.1-1.1 0c-.3-.1-.6-.2-1-.4c-1.8-.8-3-2.8-3.1-2.9c-.1-.1-.7-.9-.7-1.7s.4-1.1.6-1.2c.2-.1.3-.1.4-.1h.3c.1 0 .3 0 .4.3l.5 1.2c.1.2.1.3 0 .4l-.2.3c-.1.1-.2.2-.1.4c.1.2.5.8 1 1.3c.7.6 1.2.8 1.4.9c.2.1.3.1.4 0l.5-.6c.1-.1.2-.2.4-.1l1.2.6c.2.1.3.2.3.3c0 .1 0 .4-.1.6z"/>
-            </svg>
-          </div>
-          <div class="iconLabel">واتساب</div>
-        </a>
-
-        <a class="iconCard" href="mailto:malsllami@gmail.com" aria-label="gmail">
-          <div class="iconWrap" title="جيميل">
-            <svg viewBox="0 0 24 24" class="ico" aria-hidden="true">
-              <path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zm0 4.2l-8 5.3l-8-5.3V6l8 5.3L20 6v2.2z"/>
-            </svg>
-          </div>
-          <div class="iconLabel">جيميل</div>
-        </a>
-
-        <button class="iconCard" type="button" onclick="copyBank()" aria-label="bank">
-          <div class="iconWrap" title="بنك الراجحي">
-            <svg viewBox="0 0 24 24" class="ico" aria-hidden="true">
-              <path d="M3 10h18v2H3v-2zm2 3h2v7H5v-7zm4 0h2v7H9v-7zm4 0h2v7h-2v-7zm4 0h2v7h-2v-7zM2 9l10-6l10 6v1H2V9z"/>
-            </svg>
-          </div>
-          <div class="iconLabel">الراجحي</div>
-        </button>
-      </div>
-
-      <div class="note">ملاحظة, زر الراجحي ينسخ رقم الايبان مباشرة</div>
+      <h3>تواصل</h3>
+      <div>صفحة اختيارية</div>
     </div>
   </div>
 
@@ -81,16 +30,5 @@
   <script src="assets/js/api.js"></script>
   <script src="assets/js/ui.js"></script>
   <script src="assets/js/auth_ui.js"></script>
-  <script>
-    async function copyBank(){
-      const iban = "SA76 8000 0380 6080 1600 6199";
-      try{
-        await navigator.clipboard.writeText(iban);
-        msg("ok","تم نسخ الايبان");
-      }catch(e){
-        msg("ok","انسخ الايبان من هنا: " + iban);
-      }
-    }
-  </script>
 </body>
 </html>
