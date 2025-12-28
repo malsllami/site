@@ -25,14 +25,27 @@
     <div class="card">
       <h3>ملخص الجمعية</h3>
       <div id="socInfo"></div>
+
+      <div class="mt12">
+        <div class="row" style="gap:10px;flex-wrap:wrap">
+          <button class="btn btn2" id="tabMembers" onclick="showSection('members')">المشتركين</button>
+          <button class="btn btn2" id="tabCollection" onclick="showSection('collection')">التحصيل</button>
+          <button class="btn btn2" id="tabDelivery" onclick="showSection('delivery')">التسليم</button>
+        </div>
+      </div>
     </div>
 
-    <div class="card">
+    <div class="card" id="secMembers" style="display:none">
+      <h3>المشتركين في الجمعية</h3>
+      <div id="membersArea"></div>
+    </div>
+
+    <div class="card" id="secCollection" style="display:none">
       <h3>التحصيل</h3>
       <div id="collectionArea"></div>
     </div>
 
-    <div class="card">
+    <div class="card" id="secDelivery" style="display:none">
       <h3>التسليم</h3>
       <div id="deliveryArea"></div>
     </div>
