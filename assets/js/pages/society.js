@@ -40,6 +40,8 @@ window._sid = "";
       document.getElementById("btnUpdate").style.display = "";
       document.getElementById("btnLeave").style.display = "";
       document.getElementById("prefArea").style.display = (String(soc.حالة) === "جديدة") ? "" : "none";
+
+      await renderPrefsSummary();
     }else{
       setHtml("subState", `<div class="warn warn-gray">انت غير مشترك في هذه الجمعية</div>`);
       document.getElementById("btnJoin").style.display = "";
@@ -52,6 +54,50 @@ window._sid = "";
     msg("err", e.message);
   }
 })();
+
+async function renderPrefsSummary(){
+  const s = جلسة();
+  try{
+    const d = await get("رغبات حالة", { token: s.token, معرف_الجمعية: window._sid });
+    const pref = d.رغبات || null;
+    const months = d.الاشهر || [];
+    const myShares = Number(d.عدد_اسهم_المشترك || 0);
+
+    if(!pref){
+      setHtml("subState", `<div class="warn warn-orange">لم يتم ادخال الرغبات بعد</div>`);
+      return;
+    }
+
+    let total = 0;
+    const lines = [];
+
+    for(let i = 1; i <= months.length; i++){
+      const v = Number(pref["شهر " + i] || 0);
+      if(v > 0){
+        total += v;
+        lines.push(`${months[i - 1]} عدد الاسهم ${v}`);
+      }
+    }
+
+    const listHtml = lines.length
+      ? `<div class="mt8 small">${lines.map(x => esc(x)).join("<br>")}</div>`
+      : `<div class="mt8 small">لا يوجد اسهم تسليم محددة</div>`;
+
+    const okMatch = Math.abs(total - myShares) < 0.000001;
+
+    setHtml("subState",
+      `<div class="ok">
+         تم ادخال الرغبات
+         <div class="mt8">مجموع الاسهم ${esc(total)} من ${esc(myShares)}</div>
+         ${okMatch ? "" : `<div class="mt8" style="color:#8a1e1e">تنبيه مجموع الرغبات لا يطابق عدد اسهمك</div>`}
+         ${listHtml}
+       </div>`
+    );
+
+  }catch(e){
+    setHtml("subState", `<div class="warn warn-orange">تعذر تحميل ملخص الرغبات</div>`);
+  }
+}
 
 function disable(id, on){
   const el = document.getElementById(id);
@@ -86,8 +132,9 @@ async function updateShares(){
   try{
     const عدد_الاسهم = document.getElementById("shares").value.trim();
     await post({ action: "تعديل اشتراك جمعية", token: s.token, معرف_الجمعية: window._sid, عدد_الاسهم });
-    msg("ok", "تم تعديل الاسهم, اذا كانت لك رغبات سابقة تم حذفها وتحتاج تعيد ادخالها");
+    msg("ok", "تم تعديل الاسهم, تم حذف الرغبات السابقة وتحتاج تعيد ادخالها");
     document.getElementById("prefArea").style.display = "";
+    setHtml("subState", `<div class="warn warn-orange">تم تعديل الاسهم, ادخل الرغبات من جديد</div>`);
   }catch(e){
     msg("err", e.message);
   }finally{
