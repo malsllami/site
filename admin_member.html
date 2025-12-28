@@ -1,26 +1,21 @@
-<!-- site/admin_member.html , ملف جديد -->
 <!doctype html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>إدارة مشترك</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ادارة الجمعية</title>
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
-<body class="admin-theme">
+<body>
   <div class="top">
     <div class="row">
-      <button class="hamburger" id="btnMenu" aria-label="القائمة" onclick="toggleMobileMenu()">
-        <span></span><span></span><span></span>
-      </button>
-
-      <div class="nav mobileMenu" id="mobileMenu">
-        <a href="index.html">الشاشة الرئيسية</a>
-        <a href="admin.html">شاشة المدير</a>
+      <div>
+        <a href="admin.html" id="navAdmin">شاشة المدير</a>
+      </div>
+      <div class="brand">جمعية عائلية</div>
+      <div>
         <a href="#" id="navLogout" style="display:none">خروج</a>
       </div>
-
-      <div class="brand">جمعية عائلية</div>
     </div>
   </div>
 
@@ -28,75 +23,19 @@
     <div id="msg"></div>
 
     <div class="card">
-      <div class="cardHead">
-        <h3>إدارة مشترك</h3>
-        <div class="align-end">
-          <button class="btn btn2" onclick="location.href='admin.html'">رجوع</button>
-        </div>
-      </div>
-
-      <div id="memberInfo"></div>
+      <h3>ملخص الجمعية</h3>
+      <div id="socInfo"></div>
     </div>
 
     <div class="card">
-      <div class="cardHead">
-        <h3>رمز PIN</h3>
-        <div class="muted">يمكنك التعديل والنسخ</div>
-      </div>
-
-      <div class="grid">
-        <div class="col-8">
-          <input class="input" id="pinNew" placeholder="PIN جديد, 6 ارقام مثلا">
-        </div>
-        <div class="col-4">
-          <button class="btn" id="btnSavePin" onclick="savePin()">حفظ</button>
-        </div>
-
-        <div class="col-12">
-          <div class="warn warn-gray">
-            <div class="grid">
-              <div class="col-8">
-                <div class="small">PIN الحالي</div>
-                <div style="font-weight:900;font-size:20px" id="pinCurrent">-</div>
-              </div>
-              <div class="col-4 align-end">
-                <button class="btn btn2" onclick="copyText('pinCurrent')">نسخ</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
+      <h3>التحصيل</h3>
+      <div id="collectionArea"></div>
     </div>
 
     <div class="card">
-      <div class="cardHead">
-        <h3>اشتراكات المشترك</h3>
-        <div class="muted">إدارة الأسهم والرغبات لكل جمعية</div>
-      </div>
-
-      <div id="subsBox"></div>
+      <h3>التسليم</h3>
+      <div id="deliveryArea"></div>
     </div>
-
-    <!-- محرر الرغبات -->
-    <div class="card" id="prefsCard" style="display:none">
-      <div class="cardHead">
-        <h3 id="prefsTitle">رغبات المشترك</h3>
-        <div class="align-end">
-          <button class="btn btn2" onclick="closePrefs()">إغلاق</button>
-        </div>
-      </div>
-
-      <div id="prefsMeta" class="small"></div>
-      <div id="prefsTable"></div>
-
-      <div id="prefsMsg" class="mt12"></div>
-
-      <div class="align-end mt12">
-        <button class="btn" id="btnSavePrefs" onclick="savePrefs()">حفظ</button>
-      </div>
-    </div>
-
   </div>
 
   <script src="assets/js/config.js"></script>
