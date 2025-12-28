@@ -53,9 +53,9 @@ async function post(body) {
 }
 
 function حفظ_جلسة(token, role, name) {
-  localStorage.setItem("token", token || "");
-  localStorage.setItem("role", role || "");
-  if (name != null) localStorage.setItem("name", String(name || ""));
+  localStorage.setItem("token", String(token || "").trim());
+  localStorage.setItem("role", String(role || "").trim());
+  if (name != null) localStorage.setItem("name", String(name || "").trim());
 }
 
 function جلسة() {
