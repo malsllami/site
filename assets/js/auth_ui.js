@@ -1,42 +1,28 @@
-function esc(s){
-  return String(s == null ? "" : s)
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
-}
+(function(){
+  const s = جلسة();
 
-function setHtml(id, html){
-  const el = document.getElementById(id);
-  if(el) el.innerHTML = html;
-}
+  const navLogout = document.getElementById("navLogout");
+  const navAdmin = document.getElementById("navAdmin");
+  const navMember = document.getElementById("navMember");
+  const navRegister = document.getElementById("navRegister");
 
-function setText(id, text){
-  const el = document.getElementById(id);
-  if(el) el.textContent = text;
-}
-
-function msg(type, text){
-  const el = document.getElementById("msg");
-  if(!el) return;
-  if(!text){
-    el.innerHTML = "";
-    return;
+  if(navLogout){
+    navLogout.style.display = s.token ? "" : "none";
+    navLogout.onclick = (e) => {
+      e.preventDefault();
+      خروج();
+    };
   }
-  const cls = type === "ok" ? "ok" : "err";
-  el.innerHTML = `<div class="${cls}">${esc(text)}</div>`;
-}
 
-function badge(state){
-  const s = String(state || "");
-  if(s === "جديدة") return `<span class="badge b1">جديدة</span>`;
-  if(s === "نشطة") return `<span class="badge b2">نشطة</span>`;
-  if(s === "مغلقة") return `<span class="badge b3">مغلقة</span>`;
-  return `<span class="badge b0">${esc(s)}</span>`;
-}
+  if(navAdmin){
+    navAdmin.style.display = (s.token && s.role === "مدير") ? "" : "none";
+  }
 
-function q(name){
-  const url = new URL(location.href);
-  return url.searchParams.get(name) || "";
-}
+  if(navMember){
+    navMember.style.display = (s.token && s.role === "مشترك") ? "" : "none";
+  }
+
+  if(navRegister){
+    navRegister.style.display = s.token ? "none" : "";
+  }
+})();
