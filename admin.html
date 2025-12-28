@@ -1,8 +1,8 @@
 <!doctype html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>شاشة المدير</title>
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
@@ -10,7 +10,7 @@
   <div class="top">
     <div class="row">
       <div>
-        <a href="index.html" id="navHome">الشاشة الرئيسية</a>
+        <a href="index.html" id="navHome">الرئيسية</a>
         <a href="register.html" id="navRegister">شاشة التسجيل</a>
       </div>
       <div class="brand">جمعية عائلية</div>
@@ -29,29 +29,25 @@
       <h3>انشاء جمعية جديدة</h3>
 
       <div class="grid2">
-        <div>
-          <div class="lbl">اسم الجمعية</div>
-          <input id="societyName" class="in" placeholder="اسم الجمعية">
+        <div class="field">
+          <label>اسم الجمعية</label>
+          <input id="socName" type="text" autocomplete="off">
         </div>
-        <div>
-          <div class="lbl">تاريخ البداية</div>
-          <input id="societyStart" class="in" type="date">
+
+        <div class="field">
+          <label>تاريخ البداية</label>
+          <input id="socStart" type="date">
         </div>
       </div>
 
       <div class="align-end mt12">
-        <button id="btnCreateSociety" class="btn">انشاء</button>
+        <button id="btnCreateSoc" class="btn" type="button">انشاء</button>
       </div>
     </div>
 
     <div class="card">
       <h3>الجمعيات</h3>
-      <div id="societies"></div>
-    </div>
-
-    <div class="card">
-      <h3>المشتركين</h3>
-      <div id="members"></div>
+      <div id="socList"></div>
     </div>
   </div>
 
