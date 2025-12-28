@@ -1,87 +1,84 @@
 (async function(){
-  const s = جلسة()
+  const s = جلسة();
   if(!s.token || s.role !== "مدير"){
-    location.href = "register.html"
-    return
+    location.href = "register.html";
+    return;
   }
-
-  const btn = document.getElementById("btnCreateSoc")
-  if(btn){
-    btn.addEventListener("click", async function(e){
-      e.preventDefault()
-      await createSociety()
-    })
-  }
-
-  await loadAdmin()
-})()
+  document.getElementById("navLogout").style.display = "";
+  await loadAdmin();
+})();
 
 async function loadAdmin(){
-  const s = جلسة()
-  msg("", "")
-
+  const s = جلسة();
+  msg("", "");
   try{
-    const d = await get("معلومات مدير", { token: s.token })
-    const arr = d.جمعيات || []
+    const d = await get("معلومات مدير", { token: s.token });
+    const list = d.جمعيات || [];
 
-    if(!arr.length){
-      setHtml("socList", "<div class='warn warn-gray'>لا يوجد جمعيات</div>")
-      return
-    }
+    const news = list.filter(x => String(x.حالة) === "جديدة");
+    const actives = list.filter(x => String(x.حالة) !== "جديدة");
 
-    const html = arr.map(x => `
-      <div class="soc">
-        <b>${esc(x.اسم)}</b>
-        <div class="mt8">${badge(x.حالة)}</div>
-        <div class="mt8">عدد المشتركين ${esc(x.عدد_المشتركين || 0)}</div>
-        <div class="mt8">عدد الاسهم ${esc(x.عدد_الاسهم || 0)}</div>
-        <div class="mt12 align-end">
-          <button class="btn btn2" type="button" onclick="openSociety('${esc(x.معرف)}')">فتح</button>
-        </div>
-      </div>
-    `).join("")
-
-    setHtml("socList", html)
+    renderSocCards("newSocieties", news);
+    renderSocCards("activeSocieties", actives);
 
   }catch(e){
-    msg("err", e.message)
+    msg("err", e.message);
   }
 }
 
-function openSociety(id){
-  if(!id) return
-  location.href = "admin_member.html?معرف=" + encodeURIComponent(String(id))
+function renderSocCards(el, arr){
+  if(!arr.length){
+    setHtml(el, "<div class='warn warn-gray'>لا يوجد</div>");
+    return;
+  }
+
+  setHtml(el, arr.map(s => `
+    <div class="cardItem">
+      <div class="titleRow">
+        <b>${esc(s.اسم)}</b>
+        ${badge(s.حالة)}
+      </div>
+      <div class="meta">
+        <div>البداية ${esc(s.تاريخ_البداية || "")}</div>
+        <div>النهاية ${esc(s.تاريخ_النهاية || "")}</div>
+        <div>عدد المشتركين ${esc(s.عدد_المشتركين || 0)}</div>
+        <div>عدد الاسهم ${esc(s.عدد_الاسهم || 0)}</div>
+      </div>
+      <div class="actions">
+        <button class="btn btn2" onclick="openSoc('${esc(s.معرف)}')">ادخل</button>
+      </div>
+    </div>
+  `).join(""));
 }
 
+function openSoc(id){
+  location.href = "admin_member.html?معرف=" + encodeURIComponent(id);
+}
+
+let _busyCreate = false;
 async function createSociety(){
-  const s = جلسة()
-  msg("", "")
+  if(_busyCreate) return;
+  _busyCreate = true;
 
-  const name = (document.getElementById("socName").value || "").trim()
-  const start = (document.getElementById("socStart").value || "").trim()
+  const s = جلسة();
+  msg("", "");
 
-  if(!name){
-    msg("err", "اسم الجمعية مطلوب")
-    return
-  }
-  if(!start){
-    msg("err", "تاريخ البداية مطلوب")
-    return
-  }
+  const اسم_الجمعية = document.getElementById("socName").value.trim();
+  const تاريخ_البداية = document.getElementById("socStart").value.trim();
 
   try{
     await post({
       action: "انشاء جمعية",
       token: s.token,
-      اسم_الجمعية: name,
-      تاريخ_البداية: start
-    })
-
-    document.getElementById("socName").value = ""
-    msg("ok", "تم انشاء الجمعية")
-    await loadAdmin()
-
+      اسم_الجمعية,
+      تاريخ_البداية
+    });
+    document.getElementById("socName").value = "";
+    msg("ok", "تم انشاء الجمعية");
+    await loadAdmin();
   }catch(e){
-    msg("err", e.message)
+    msg("err", e.message);
+  }finally{
+    _busyCreate = false;
   }
 }
