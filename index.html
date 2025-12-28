@@ -2,19 +2,21 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>الرئيسية</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>جمعية عائلية</title>
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
   <div class="top">
     <div class="row">
-      <div>
-        <a href="index.html" id="navHome">الرئيسية</a>
-        <a href="register.html" id="navRegister">التسجيل</a>
+      <div class="nav">
+        <a href="index.html" id="navHome">الشاشة الرئيسية</a>
+        <a href="register.html" id="navRegister">شاشة التسجيل</a>
       </div>
+
       <div class="brand">جمعية عائلية</div>
-      <div>
+
+      <div class="nav">
         <a href="member.html" id="navMember">صفحتي</a>
         <a href="admin.html" id="navAdmin">شاشة المدير</a>
         <a href="#" id="navLogout" style="display:none">خروج</a>
@@ -23,12 +25,11 @@
   </div>
 
   <div class="container">
+    <div id="msg"></div>
+
     <div class="card">
-      <h3>مرحباً</h3>
-      <div class="mt8">هذه الصفحة فقط تحويل حسب الجلسة</div>
-      <div class="mt12">
-        <button class="btn" onclick="location.href='register.html'">الذهاب للتسجيل</button>
-      </div>
+      <h3>الجمعيات</h3>
+      <div id="societies"></div>
     </div>
   </div>
 
