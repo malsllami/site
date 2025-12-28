@@ -1,4 +1,5 @@
 window._sid = "";
+window._dash = null;
 
 (async function(){
   const s = جلسة();
@@ -6,8 +7,6 @@ window._sid = "";
     location.href = "register.html";
     return;
   }
-
-  document.getElementById("navLogout").style.display = "";
 
   const sid = q("معرف") || "";
   if(!sid){
@@ -17,7 +16,26 @@ window._sid = "";
   window._sid = sid;
 
   await loadDashboard();
+  showSection("members");
 })();
+
+function showSection(name){
+  const secMembers = document.getElementById("secMembers");
+  const secCollection = document.getElementById("secCollection");
+  const secDelivery = document.getElementById("secDelivery");
+
+  if(secMembers) secMembers.style.display = (name === "members") ? "" : "none";
+  if(secCollection) secCollection.style.display = (name === "collection") ? "" : "none";
+  if(secDelivery) secDelivery.style.display = (name === "delivery") ? "" : "none";
+
+  const b1 = document.getElementById("tabMembers");
+  const b2 = document.getElementById("tabCollection");
+  const b3 = document.getElementById("tabDelivery");
+
+  if(b1) b1.className = (name === "members") ? "btn" : "btn btn2";
+  if(b2) b2.className = (name === "collection") ? "btn" : "btn btn2";
+  if(b3) b3.className = (name === "delivery") ? "btn" : "btn btn2";
+}
 
 async function loadDashboard(){
   const s = جلسة();
@@ -25,6 +43,8 @@ async function loadDashboard(){
 
   try{
     const d = await get("لوحة جمعية للمدير", { token: s.token, معرف_الجمعية: window._sid });
+    window._dash = d;
+
     const soc = d.جمعية;
 
     setHtml("socInfo",
@@ -35,15 +55,56 @@ async function loadDashboard(){
        <div class="kv"><div class="k">عدد الاسهم</div><div class="v">${esc(soc.عدد_الاسهم)}</div></div>`
     );
 
-    renderCollectionCards(d);
-    renderDeliveryCards(d);
+    renderMembers(d);
+    renderCollection(d);
+    renderDelivery(d);
 
   }catch(e){
     msg("err", e.message);
   }
 }
 
-function renderCollectionCards(d){
+function renderMembers(d){
+  const اعض = d.اعضاء || [];
+  if(!membersHasDom()){
+    return;
+  }
+
+  if(!عظ(اعض)){
+    setHtml("membersArea", "<div class='warn warn-gray'>لا يوجد مشتركين</div>");
+    return;
+  }
+
+  const html = اعض.map(m=>{
+    const months = Array.isArray(m.اشهر) ? m.اشهر : [];
+    const lines = months.map((v, idx)=>{
+      const vv = Number(v || 0);
+      if(!(vv > 0)) return "";
+      return `<div class="small mt6">شهر ${idx + 1} اسهم ${esc(vv)}</div>`;
+    }).filter(x=>x).join("");
+
+    return `
+      <div class="soc">
+        <b>${esc(m.الاسم)}</b>
+        <div class="mt8">عدد الاسهم ${esc(m.عدد_الاسهم)}</div>
+        <div class="mt8">اجمالي رغباته ${esc(m.اجمالي)}</div>
+        ${lines ? `<div class="mt8">${lines}</div>` : `<div class="small mt8">لا توجد رغبات محفوظة</div>`}
+      </div>
+    `;
+  }).join("");
+
+  setHtml("membersArea", html);
+}
+
+function membersHasDom(){
+  return !!document.getElementById("membersArea");
+}
+
+function عظ(arr){
+  return Array.isArray(arr) && arr.length > 0;
+}
+
+function renderCollection(d){
   const months = (d.تحصيل && d.تحصيل.اشهر) ? d.تحصيل.اشهر : [];
   if(!months.length){
     setHtml("collectionArea", "<div class='warn warn-gray'>لا يوجد بيانات</div>");
@@ -51,31 +112,29 @@ function renderCollectionCards(d){
   }
 
   const html = months.map(m => {
-    const memberCards = (m.صفوف || []).map(r => `
-      <div class="memberCard">
-        <div class="row2">
-          <div>
-            <div class="name">${esc(r.الاسم)}</div>
-            <div class="small">الاسهم ${esc(r.عدد_الاسهم)} , قيمة التحصيل ${esc(r.قيمة_التحصيل)}</div>
-            <div class="small">تاريخ ${esc(r.تاريخ_التحصيل || "")}</div>
-          </div>
-          <div class="controls">
+    const rows = (m.صفوف || []).map(r => {
+      const checked = r.تم_التحصيل ? "checked" : "";
+      return `
+        <div class="soc" style="margin-top:10px">
+          <b>${esc(r.الاسم)}</b>
+          <div class="mt8">الاسهم ${esc(r.عدد_الاسهم)}</div>
+          <div class="mt8">قيمة التحصيل ${esc(r.قيمة_التحصيل)}</div>
+          <div class="mt8">
             <label class="small">
-              <input type="checkbox" ${r.تم_التحصيل ? "checked" : ""} onchange="toggleCollect('${esc(m.رقم_الشهر)}','${esc(r.معرف_المستخدم)}',this.checked)">
-              تم
+              <input type="checkbox" ${checked} onchange="toggleCollect('${esc(m.رقم_الشهر)}','${esc(r.معرف_المستخدم)}',this.checked)">
+              تم التحصيل
             </label>
           </div>
+          <div class="small mt8">${esc(r.تاريخ_التحصيل || "")}</div>
         </div>
-      </div>
-    `).join("");
+      `;
+    }).join("");
 
     return `
-      <div class="cardItem monthCard">
-        <div class="titleRow">
-          <b>التحصيل الشهر ${esc(m.رقم_الشهر)} , ${esc(m.شهر_ميلادي)}</b>
-          <span class="pill">قيمة التحصيل للشهر ${esc(d.تحصيل.قيمة_التحصيل_للشهر || "")}</span>
-        </div>
-        <div class="memberCards">${memberCards || "<div class='warn warn-gray'>لا يوجد</div>"}</div>
+      <div class="soc">
+        <b>الشهر ${esc(m.رقم_الشهر)} ${esc(m.شهر_ميلادي)}</b>
+        <div class="small mt8">قيمة التحصيل للشهر ${esc(d.تحصيل.قيمة_التحصيل_للشهر || "")}</div>
+        <div class="mt12">${rows || "<div class='warn warn-gray'>لا يوجد</div>"}</div>
       </div>
     `;
   }).join("");
@@ -83,7 +142,7 @@ function renderCollectionCards(d){
   setHtml("collectionArea", html);
 }
 
-function renderDeliveryCards(d){
+function renderDelivery(d){
   const months = (d.تسليم && d.تسليم.اشهر) ? d.تسليم.اشهر : [];
   if(!months.length){
     setHtml("deliveryArea", "<div class='warn warn-gray'>لا يوجد بيانات</div>");
@@ -91,41 +150,35 @@ function renderDeliveryCards(d){
   }
 
   const html = months.map(m => {
-    const onlyReceivers = (m.صفوف || []).filter(r => Number(r.اسهم_هذا_الشهر || 0) > 0);
-
-    const memberCards = onlyReceivers.map(r => `
-      <div class="memberCard">
-        <div class="row2">
-          <div>
-            <div class="name">${esc(r.الاسم)}</div>
-            <div class="small">اسهم هذا الشهر ${esc(r.اسهم_هذا_الشهر)} , قيمة التسليم ${esc(r.قيمة_التسليم)}</div>
-            <div class="small">تاريخ ${esc(r.تاريخ_التسليم || "")}</div>
-          </div>
-          <div class="controls">
+    const rows = (m.صفوف || []).map(r => {
+      const checked = r.تم_التسليم ? "checked" : "";
+      return `
+        <div class="soc" style="margin-top:10px">
+          <b>${esc(r.الاسم)}</b>
+          <div class="mt8">اسهم هذا الشهر ${esc(r.اسهم_هذا_الشهر)}</div>
+          <div class="mt8">قيمة التسليم ${esc(r.قيمة_التسليم)}</div>
+          <div class="mt8">
             <label class="small">
-              <input type="checkbox" ${r.تم_التسليم ? "checked" : ""} onchange="toggleDeliver('${esc(m.رقم_الشهر)}','${esc(r.معرف_المستخدم)}',this.checked)">
-              تم
+              <input type="checkbox" ${checked} onchange="toggleDeliver('${esc(m.رقم_الشهر)}','${esc(r.معرف_المستخدم)}',this.checked)">
+              تم التسليم
             </label>
           </div>
+          <div class="small mt8">${esc(r.تاريخ_التسليم || "")}</div>
         </div>
+      `;
+    }).join("");
+
+    const summary = `
+      <div class="small mt8">
+        الموجود ${esc(m.الموجود)} , فائض سابق ${esc(m.فائض_سابق)} , اجمالي التسليم ${esc(m.اجمالي_التسليم)} , فائض بعد ${esc(m.فائض_بعد)}
       </div>
-    `).join("");
+    `;
 
     return `
-      <div class="cardItem monthCard">
-        <div class="titleRow">
-          <b>التسليم الشهر ${esc(m.رقم_الشهر)} , ${esc(m.شهر_ميلادي)}</b>
-          <span class="pill">اسهم التسليم ${esc(m.اجمالي_اسهم_التسليم || 0)}</span>
-        </div>
-
-        <div class="pills">
-          <span class="pill">الموجود ${esc(m.الموجود)}</span>
-          <span class="pill">فائض سابق ${esc(m.فائض_سابق)}</span>
-          <span class="pill">اجمالي التسليم ${esc(m.اجمالي_التسليم)}</span>
-          <span class="pill">فائض بعد ${esc(m.فائض_بعد)}</span>
-        </div>
-
-        <div class="memberCards">${memberCards || "<div class='warn warn-gray'>لا يوجد مستلمين في هذا الشهر</div>"}</div>
+      <div class="soc">
+        <b>الشهر ${esc(m.رقم_الشهر)} ${esc(m.شهر_ميلادي)}</b>
+        ${summary}
+        <div class="mt12">${rows || "<div class='warn warn-gray'>لا يوجد مستلمين لهذا الشهر</div>"}</div>
       </div>
     `;
   }).join("");
